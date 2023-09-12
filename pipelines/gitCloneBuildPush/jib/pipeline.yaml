@@ -34,7 +34,7 @@ spec:
       workspace: shared-data
     params:
     - name: IMAGE
-      value: lokeshkarakala/springapplication
+      value: <docker-registry-name>/springapplication
     - name: DIRECTORY
       value: ./springapp
     - name: MAVEN_IMAGE

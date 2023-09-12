@@ -27,4 +27,4 @@ spec:
   - name: repo-url
     value: https://github.com/lokesh-cmi/SpringApplication.git
   - name: image-reference
-    value: lokeshkarakala/springapplication:latest
+    value: <docker-registry-name>/springapplication:latest

@@ -5,19 +5,6 @@ metadata:
 spec:
   pipelineRef:
     name: clone-build-push
-  # taskRunSpecs:
-  #   - pipelineTaskName: fetch-source
-  #       requests:
-  #         cpu: 0.5
-  #   - pipelineTaskName: fetch-source-1
-  #       requests:
-  #         cpu: 0.5
-  #   - pipelineTaskName: fetch-source-2
-  #       requests:
-  #         cpu: 0.5
-  #   - pipelineTaskName: fetch-source-3
-  #       requests:
-  #         cpu: 0.5
 
   podTemplate:
     securityContext:
@@ -46,5 +33,4 @@ spec:
     value: https://github.com/tic-oss/generator-jhipster.git
   - name: repo-url-3
     value: https://github.com/tic-oss/jhipster-blueprints.git
-  # - name: DOCKERFILE_PATH
-  #   value: Dockerfile
+    
