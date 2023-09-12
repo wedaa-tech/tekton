@@ -1,0 +1,30 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: springboot-run-
+spec:
+  serviceAccountName: build-bot
+  pipelineRef:
+    name: springboot
+
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+  - name: shared-data
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+  - name: docker-credentials
+    secret:
+      secretName: docker-credentials
+
+  params:
+  - name: repo-url
+    value: https://github.com/lokesh-cmi/SpringApplication.git
+  - name: image-reference
+    value: lokeshkarakala/springapplication:latest

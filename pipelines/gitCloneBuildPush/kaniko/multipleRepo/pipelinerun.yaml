@@ -1,0 +1,50 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: clone-build-push-run-
+spec:
+  pipelineRef:
+    name: clone-build-push
+  # taskRunSpecs:
+  #   - pipelineTaskName: fetch-source
+  #       requests:
+  #         cpu: 0.5
+  #   - pipelineTaskName: fetch-source-1
+  #       requests:
+  #         cpu: 0.5
+  #   - pipelineTaskName: fetch-source-2
+  #       requests:
+  #         cpu: 0.5
+  #   - pipelineTaskName: fetch-source-3
+  #       requests:
+  #         cpu: 0.5
+
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+  - name: shared-data
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+  - name: docker-credentials
+    secret:
+      secretName: docker-credentials
+
+  params:
+  - name: repo-url
+    value: https://github.com/tic-oss/wda-server.git
+  - name: image-reference
+    value: lokeshkarakala/wda-server:latest
+  - name: repo-url-1
+    value: https://github.com/tic-oss/generator-tf-wdi.git
+  - name: repo-url-2
+    value: https://github.com/tic-oss/generator-jhipster.git
+  - name: repo-url-3
+    value: https://github.com/tic-oss/jhipster-blueprints.git
+  # - name: DOCKERFILE_PATH
+  #   value: Dockerfile
