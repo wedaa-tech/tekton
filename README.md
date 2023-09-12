@@ -11,7 +11,7 @@ Tekton is an open-source cloud native CI/CD (Continuous Integration and Continuo
     <li>Built-in best practices</li>
     <li>Maximum flexibility</li><br>
 </ul>
-#####Tekton basic building blocks
+<h4>Tekton basic building blocks</h4>
 <ul>
 <li>Step = Container(basic part)</li>
 <li>Task = pods(sequence of steps)</li>
@@ -19,7 +19,7 @@ Tekton is an open-source cloud native CI/CD (Continuous Integration and Continuo
 </ul>
 <center><img src=/images/Pipeline.png></center>
 
-#### <b>Tekton Triggers:</b>
+<h4> <b>Tekton Triggers:</b></h4>
 You can use Tekton Triggers to modify the behavior of your CI/CD Pipelines depending on external events.
 <ul>
 <li>Trigger Binding(Custom resource that extracts relevant Information from event payload) </li>

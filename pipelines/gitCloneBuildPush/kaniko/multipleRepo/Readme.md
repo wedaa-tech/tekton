@@ -1,8 +1,8 @@
-<h3><center>Clone, Build and push a Git Repository using Tekton</center></h3>
+<h3>Clone, Build and push multiple Git Repositories using Tekton</h3>
 <h4>Prerequisites:</h4>
 <ol>
     <li>Have a kubernetes cluster running and install kubectl</li>
-    <li>Install Tekton Pipelines using <br>
+    <li>Install Tekton Pipelines using<br>
         kubectl apply –-filename \ 
         https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
     </li>
@@ -21,7 +21,7 @@
         </ul>
     </li>
 </ol>
-<h5>Create the Pipeline which contains the clone, build and push a git repository</h5>
+<h5>Create the Pipeline which contains the clone, build and push multiple git repositories</h5>
 The example pipeline will look like:<br>
 ```
 //pipeline.yml
@@ -35,6 +35,14 @@ spec:
     pushes it to a registry
   params:
   - name: repo-url
+    type: string
+  - name: image-reference
+    type: string
+  - name: repo-url-1
+    type: string
+  - name: repo-url-2
+    type: string
+  - name: repo-url-3
     type: string
 
   workspaces:
@@ -51,8 +59,44 @@ spec:
     params:
     - name: url
       value: $(params.repo-url)
-  - name: build-push
+  - name: fetch-source-1
     runAfter: ["fetch-source"]
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    params:
+    - name: url
+      value: $(params.repo-url-1)
+    - name: subdirectory
+      value: generator-tf-wdi
+  - name: fetch-source-2
+    runAfter: ["fetch-source","fetch-source-1"]
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    params:
+    - name: url
+      value: $(params.repo-url-2)
+    - name: subdirectory
+      value: generator-jhipster
+  - name: fetch-source-3
+    runAfter: ["fetch-source","fetch-source-1","fetch-source-2"]
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    params:
+    - name: url
+      value: $(params.repo-url-3)
+    - name: subdirectory
+      value: jhipster-blueprints
+  - name: build-push
+    runAfter: ["fetch-source","fetch-source-1","fetch-source-2","fetch-source-3"]
     taskRef:
       name: kaniko
     workspaces:
@@ -93,9 +137,15 @@ spec:
 
   params:
   - name: repo-url
-    value: <paste_the_git_url>
+    value: https://github.com/tic-oss/wda-server.git
   - name: image-reference
-    value: <docker_registry>/<image_name>:latest
+    value: lokeshkarakala/wda-server:latest
+  - name: repo-url-1
+    value: https://github.com/tic-oss/generator-tf-wdi.git
+  - name: repo-url-2
+    value: https://github.com/tic-oss/generator-jhipster.git
+  - name: repo-url-3
+    value: https://github.com/tic-oss/jhipster-blueprints.git
 ```
 The following code is used to clone(using git-clone from Tekton Hub) and build-push( using Kaniko from Tekton Hub).
 
@@ -112,3 +162,6 @@ data:
 ```
 <br>config.json can be found using the following command ```nano .docker/config.json```
 Remember kaniko is used only when there is a Dockerfile written in the application
+
+```runAfter``` make sure that the task starts only after successful execution of the defined task.
+In workspace, only one directory is created and allocated to the first repository created. Therefore subdirectories are added for the respective repositories.
