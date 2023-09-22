@@ -1,4 +1,4 @@
-<h3>center>Clone, Build and push multiple Git Repositories using Tekton</h3>
+<h3><center>Clone, Build and push multiple Git Repositories using Tekton</h3>
 <h4>Prerequisites:</h4>
 <ol>
     <li>Have a kubernetes cluster running and install kubectl</li>

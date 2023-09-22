@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: clone-build-push
+  name: kaniko-single-repo
 spec:
   description: | 
     This pipeline clones a git repo, builds a Docker image with Kaniko and
@@ -9,13 +9,15 @@ spec:
   params:
   - name: repo-url
     type: string
+  - name: image-reference
+    type: string
 
   workspaces:
   - name: shared-data
   - name: docker-credentials
 
   tasks:
-  - name: fetch-source
+  - name: clone-wda-ui
     taskRef:
       name: git-clone
     workspaces:
@@ -25,7 +27,7 @@ spec:
     - name: url
       value: $(params.repo-url)
   - name: build-push
-    runAfter: ["fetch-source"]
+    runAfter: ["clone-wda-ui"]
     taskRef:
       name: kaniko
     workspaces:

@@ -1,10 +1,10 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: clone-build-push-run-
+  generateName: kaniko-single-repo-run-
 spec:
   pipelineRef:
-    name: clone-build-push
+    name: kaniko-single-repo
 
   podTemplate:
     securityContext:
@@ -24,6 +24,6 @@ spec:
 
   params:
   - name: repo-url
-    value: <paste the git url>
+    value: https://github.com/tic-oss/wda-ui.git
   - name: image-reference
-    value: <docker_registry>/<image_name>:latest
+    value: <paste docker registry>/wda-ui:latest

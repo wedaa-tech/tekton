@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: clone-build-push
+  name: kaniko-multi-repo
 spec:
   description: | 
     This pipeline clones a git repo, builds a Docker image with Kaniko and
@@ -23,7 +23,7 @@ spec:
   - name: docker-credentials
 
   tasks:
-  - name: fetch-source
+  - name: clone-wda-server
     taskRef:
       name: git-clone
     workspaces:
@@ -32,8 +32,8 @@ spec:
     params:
     - name: url
       value: $(params.repo-url)
-  - name: fetch-source-1
-    runAfter: ["fetch-source"]
+  - name: clone-generator-tf-wdi
+    runAfter: ["clone-wda-server"]
     taskRef:
       name: git-clone
     workspaces:
@@ -44,8 +44,8 @@ spec:
       value: $(params.repo-url-1)
     - name: subdirectory
       value: generator-tf-wdi
-  - name: fetch-source-2
-    runAfter: ["fetch-source","fetch-source-1"]
+  - name: clone-generator-jhipster
+    runAfter: ["clone-wda-server","clone-generator-tf-wdi"]
     taskRef:
       name: git-clone
     workspaces:
@@ -56,8 +56,8 @@ spec:
       value: $(params.repo-url-2)
     - name: subdirectory
       value: generator-jhipster
-  - name: fetch-source-3
-    runAfter: ["fetch-source","fetch-source-1","fetch-source-2"]
+  - name: clone-jhipster-blueprints
+    runAfter: ["clone-wda-server","clone-generator-tf-wdi","clone-generator-jhipster"]
     taskRef:
       name: git-clone
     workspaces:
@@ -68,8 +68,8 @@ spec:
       value: $(params.repo-url-3)
     - name: subdirectory
       value: jhipster-blueprints
-  - name: build-push
-    runAfter: ["fetch-source","fetch-source-1","fetch-source-2","fetch-source-3"]
+  - name: build-push-multi
+    runAfter: ["clone-wda-server","clone-generator-tf-wdi","clone-generator-jhipster","clone-jhipster-blueprints"]
     taskRef:
       name: kaniko
     workspaces:

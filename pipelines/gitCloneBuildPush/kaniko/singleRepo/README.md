@@ -3,7 +3,7 @@
 <ol>
     <li>Have a kubernetes cluster running and install kubectl</li>
     <li>Install Tekton Pipelines using <br>
-        kubectl apply –-filename \ 
+        kubectl apply --filename \ 
         https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
     </li>
     <li>Install Tekton CLI, tkn on your machine <br>

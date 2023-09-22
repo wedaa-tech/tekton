@@ -87,3 +87,23 @@ You can use Tekton Triggers to modify the behavior of your CI/CD Pipelines depen
         </ul>
     </li>
 </ol>
+
+<h3>Tekton Dashboard:</h3>
+<ul>
+<li>Tekton Dashboard is a general purpose, web-based UI for Tekton Pipelines and Tekton Triggers resources.</li>
+<li>It allows users to manage and view Tekton resource creation, execution, and completion.</li>
+<li>Some of the features the Tekton Dashboard supports:
+<ul>
+    <li>Realtime view of PipelineRun and TaskRun status and logs</li>
+    <li>Filter resources by label</li>
+    <li>View resource overview and YAML</li>
+    <li>Show resources for the whole cluster or limit visibility to a particular namespace</li>
+    <li>Import resources directly from a git repository</li>
+    <li>Add functionality through extensions</li>
+</ul>
+To use tekton dashboard, install crd
+```kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml```
+<br>To access the dashboard, use ```kubectl proxy``` and Browse http://localhost:8001/api/v1/namespaces/tekton-pipelines/services/tekton-dashboard:http/proxy/ to access your Dashboard.<br>
+OR
+Use port forward method ```kubectl --namespace tekton-pipelines port-forward svc/tekton-dashboard 9097:9097``` and Browse http://localhost:9097 to access your Dashboard.
+</ul>

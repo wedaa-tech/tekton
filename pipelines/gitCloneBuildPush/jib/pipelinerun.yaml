@@ -1,11 +1,11 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: springboot-run-
+  generateName: jib-repo-run-
 spec:
   serviceAccountName: build-bot
   pipelineRef:
-    name: springboot
+    name: jib-repo
 
   podTemplate:
     securityContext:
@@ -27,4 +27,6 @@ spec:
   - name: repo-url
     value: https://github.com/lokesh-cmi/SpringApplication.git
   - name: image-reference
-    value: <docker-registry-name>/springapplication:latest
+    value: <paste docker registry>/springapplication
+  - name: maven-image-reference
+    value: lokeshkarakala/custom-dev-image
