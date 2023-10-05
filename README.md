@@ -47,13 +47,13 @@ You can use Tekton Triggers to modify the behavior of your CI/CD Pipelines depen
         <ul type="disc">
             <li>Install kubectl and a kubernetes cluster should be running with the version ≥ 1.24. </li>
             <li>For installing latest official release, <br>
-            kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml</li>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml</li>
             <li>For installing Nightly release, <br>
-            kubectl apply --filename https://storage.googleapis.com/tekton-releases-nightly/pipeline/latest/release.yaml</li>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases-nightly/pipeline/latest/release.yaml</li>
             <li>For installing specific release, <br>
-            kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/previous/<version_number>/release.yaml</li>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases/pipeline/previous/<version_number>/release.yaml</li>
             <li>For installing Untagged release, <br>
-            kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.notags.yaml</li>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases/pipeline/latest/release.notags.yaml</li>
             <li>For Monitoring the Installation, <br>
             kubectl get pods --namespace tekton-pipelines --watch</li>
         </ul>
@@ -63,25 +63,17 @@ You can use Tekton Triggers to modify the behavior of your CI/CD Pipelines depen
         Install Tekton pipelines and be in the same cluster.
         <ul type="disc">
             <li>For installing latest official release, <br>
-            kubectl apply --filename \
-            https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml <br>
-            kubectl apply --filename \
-            https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml</li>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml <br>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml</li>
             <li>For installing Nightly release, <br>
-            kubectl apply --filename \
-            https://storage.googleapis.com/tekton-releases-nightly/triggers/latest/release.yaml <br>
-            kubectl apply --filename \
-            https://storage.googleapis.com/tekton-releases-nightly/triggers/latest/interceptors.yaml</li>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases-nightly/triggers/latest/release.yaml <br>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases-nightly/triggers/latest/interceptors.yaml</li>
             <li>For installing specific release, <br>
-            kubectl apply --filename \
-            https://storage.googleapis.com/tekton-releases/triggers/previous/VERSION_NUMBER/release.yaml <br>
-            kubectl apply --filename \
-            https://storage.googleapis.com/tekton-releases/triggers/previous/VERSION_NUMBER/interceptors.yaml</li>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases/triggers/previous/VERSION_NUMBER/release.yaml <br>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases/triggers/previous/VERSION_NUMBER/interceptors.yaml</li>
             <li>For installing Untagged release, <br>
-            kubectl apply --filename \
-            https://storage.googleapis.com/tekton-releases/triggers/latest/release.notags.yaml <br>
-            kubectl apply --filename \
-            https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.notags.yaml</li>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases/triggers/latest/release.notags.yaml <br>
+            kubectl apply --filename \https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.notags.yaml</li>
             <li>For Monitoring the Installation, <br>
             kubectl get pods --namespace tekton-pipelines --watch</li>
         </ul>
@@ -102,7 +94,7 @@ You can use Tekton Triggers to modify the behavior of your CI/CD Pipelines depen
     <li>Add functionality through extensions</li>
 </ul>
 To use tekton dashboard, install crd
-```kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml```
+```kubectl apply --filename \https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml```
 <br>To access the dashboard, use ```kubectl proxy``` and Browse http://localhost:8001/api/v1/namespaces/tekton-pipelines/services/tekton-dashboard:http/proxy/ to access your Dashboard.<br>
 OR
 Use port forward method ```kubectl --namespace tekton-pipelines port-forward svc/tekton-dashboard 9097:9097``` and Browse http://localhost:9097 to access your Dashboard.

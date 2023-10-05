@@ -6,8 +6,7 @@ Jib builds and pushes a image without Dockerfile configured in the application
 <ol>
     <li>Have a kubernetes cluster running and install kubectl</li>
     <li>Install Tekton Pipelines using <br>
-        kubectl apply –-filename \ 
-        https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+        kubectl apply --filename \https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
     </li>
     <li>Install Tekton CLI, tkn on your machine <br>
         To install tkn, follow <a href="https://tekton.dev/docs/cli/">https://tekton.dev/docs/cli/</a>
