@@ -1,0 +1,69 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: <%= pipelineName %>
+  namespace: <%= namespaceName %>
+spec:
+  description: | 
+    This pipeline clones a git repo, builds a Docker image with Kaniko and
+    pushes it to a registry
+  params:
+  - name: repo-url
+    type: string
+  - name: revision
+    type: string
+  - name: submodules
+    type: string
+  - name: image-reference
+    type: string
+  <%_ if (DockerfilePath == "Directory") { _%>
+  - name: context
+    type: string
+  - name: dockerfile
+    type: string
+  <%_ } _%>
+  
+  workspaces:
+  - name: shared-data
+  - name: docker-credentials
+  <%_ if (repoType == "private") { _%>
+  - name: ssh-creds
+  <%_ } _%>
+
+  tasks:
+  - name: fetch-source
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    <%_ if (repoType == "private") { _%>
+    - name: ssh-directory
+      workspace: ssh-creds
+    <%_ } _%>
+    params:
+    - name: url
+      value: $(params.repo-url)
+    - name: revision
+      value: $(params.revision)
+    - name: submodules
+      value: $(params.submodules)
+
+  - name: build-push
+    runAfter: ["fetch-source"]
+    taskRef:
+      name: kaniko
+    workspaces:
+    - name: source
+      workspace: shared-data
+    - name: dockerconfig
+      workspace: docker-credentials
+    params:
+    - name: IMAGE
+      value: $(params.image-reference)
+    <%_ if (DockerfilePath == "Directory") { _%>
+    - name: CONTEXT
+      value: $(params.context)
+    - name: DOCKERFILE
+      value: $(params.dockerfile)
+    <%_ } _%>

@@ -1,0 +1,46 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: <%= pipelineName %>-run-
+  namespace: <%= namespaceName %>
+spec:
+  serviceAccountName: <%= pipelineName %>-service-account
+  pipelineRef:
+    name: <%= pipelineName %>
+
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+  - name: shared-data
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+  - name: docker-credentials
+    secret:
+      secretName: docker-credentials
+  <%_ if (repoType == "private") { _%>
+  - name: ssh-creds
+    secret:
+      secretName: git-sshkey-secret
+  <%_ } _%>
+
+  params:
+  - name: repo-url
+    value: <%= repoURL %>
+  - name: revision
+    value: <%= branch %> 
+  - name: submodules
+    value: "false"
+  <%_ if (DockerfilePath == "Directory") { _%>
+  - name: context
+    value: <%= PathtoContext %>
+  - name: dockerfile
+    value: <%= PathtoDockerfile %>
+  <%_ } _%>
+  - name: image-reference
+    value: <%= imageRepositoryURL %>

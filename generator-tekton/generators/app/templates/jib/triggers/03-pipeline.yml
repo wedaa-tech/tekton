@@ -1,0 +1,68 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: <%= pipelineName %>
+  namespace: <%= namespaceName %>
+spec:
+  description: | 
+    This pipeline clones a git repo and builds a Spring Boot
+  params:
+  - name: repo-url
+    type: string
+  - name: revision
+    type: string
+  - name: submodules
+    type: string
+  - name: image-reference
+    type: string
+  - name: maven-image-reference
+    type: string
+  <%_ if (PathToPomFile == "Directory") { _%>
+  - name: directory
+    type: string
+  <%_ } _%>
+ 
+ 
+
+  workspaces:
+  - name: shared-data
+  - name: docker-credentials
+  <%_ if (repoType == "private") { _%>
+  - name: ssh-creds
+  <%_ } _%>
+
+  tasks:
+  - name: fetch-source
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    <%_ if (repoType == "private") { _%>
+    - name: ssh-directory
+      workspace: ssh-creds
+    <%_ } _%>
+    params:
+    - name: url
+      value: $(params.repo-url)
+    - name: revision
+      value: $(params.revision)
+    - name: submodules
+      value: $(params.submodules)
+  - name: jib-maven
+    taskRef:
+      name: jib-maven
+    runAfter: ["fetch-source"]
+    workspaces:
+    - name: source
+      workspace: shared-data
+    params:
+    - name: IMAGE
+      value: $(params.image-reference)
+    - name: MAVEN_IMAGE
+      value: $(params.maven-image-reference)
+    <%_ if (PathToPomFile == "Directory") { _%>
+    - name: DIRECTORY
+      value: $(params.directory)
+    <%_ } _%>
+   

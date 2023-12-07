@@ -1,0 +1,19 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: <%= pipelineName %>-eventlistener
+  namespace: <%= namespaceName %>
+spec:
+  resources:
+    kubernetesResource:
+      serviceType: LoadBalancer
+  serviceAccountName: <%= pipelineName %>-service-account
+  triggers:
+    - name: <%= pipelineName %>-trigger
+      bindings:
+        - ref: <%= pipelineName %>-trigger-binding
+      template:
+        ref: <%= pipelineName %>-trigger-template
+
+
+
