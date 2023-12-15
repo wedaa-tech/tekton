@@ -64,4 +64,14 @@ spec:
     - name: DIRECTORY
       value: $(params.directory)
     <%_ } _%>
+  <%_ if (SonarQube == "yes") { _%>
+  - name: code-analysis
+    taskRef:
+      name: sonarqube-scanner
+    runAfter:
+      - jib-maven
+    workspaces:
+      - name: source
+        workspace: shared-data
+  <%_ } _%>
    

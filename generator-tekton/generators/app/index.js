@@ -44,9 +44,9 @@ module.exports = class extends Generator {
       sshConfig,
       DockerfilePath,
       PathtoContext,
-      PathtoDockerfile
+      PathtoDockerfile,
+      SonarQube
     } = shouldPrompt ? props : options;
-
     const {
       buildStrategy: optionsBuildStrategy,
       k8sEnvironment: optionsK8sEnvironment
@@ -94,7 +94,8 @@ module.exports = class extends Generator {
         k8sEnvironment,
         PathtoContext,
         DockerfilePath,
-        PathtoDockerfile
+        PathtoDockerfile,
+        SonarQube
       });
     });
   }

@@ -42,6 +42,9 @@ tkn hub install task kaniko  -n ${namespace}
 <%_ if (buildStrategy == "jib-maven(for java)") { _%>
 tkn hub install task jib-maven -n ${namespace}
 <%_ } _%>
+<%_ if (SonarQube == "yes") { _%>
+tkn hub install task sonarqube-scanner -n ${namespace}
+<%_ } _%>
 echo ""
 
 sleep 30

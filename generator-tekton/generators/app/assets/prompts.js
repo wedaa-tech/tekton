@@ -112,6 +112,12 @@ let prompts = [
   },
   {
     type: "list",
+    name: "SonarQube",
+    message: "Include SonarQube for code quality analysis?",
+    choices: ["yes", "no"]
+  },
+  {
+    type: "list",
     name: "k8sEnvironment",
     message: "Enter your k8sEnvironment:",
     choices: ["azure", "aws", "minikube"]

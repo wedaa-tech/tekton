@@ -79,7 +79,7 @@ For more information on kaniko, visit https://hub.tekton.dev/tekton/task/jib-mav
 <li>Create the admin user, role, and rolebinding using the following command:</li>
 
      kubectl apply -f pipeline-yml-files/02-rbac.yml -n <namespace name> 
-   
+
 <li>create  the pipeline using the following command:</li>
 
     kubectl apply -f pipeline-yml-files/03-pipeline.yml -n <namespace name> 

@@ -67,3 +67,13 @@ spec:
     - name: DOCKERFILE
       value: $(params.dockerfile)
     <%_ } _%>
+  <%_ if (SonarQube == "yes") { _%>
+  - name: code-analysis
+    taskRef:
+      name: sonarqube-scanner
+    runAfter:
+      - build-push
+    workspaces:
+      - name: source
+        workspace: shared-data
+  <%_ } _%>
