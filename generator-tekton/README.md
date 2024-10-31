@@ -7,7 +7,7 @@ Yeoman is language agnostic. It can generate projects in any language (Web, Java
 First, install [Yeoman](http://yeoman.io) using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
 
 ```bash
-npm install -g yo
+npm install -g yo@4.3.1
 ```
 
 After cloning the repository, the generator needs to be linked with the system to activate.
