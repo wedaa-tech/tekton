@@ -55,3 +55,15 @@ The prompts will be:
 Once all the promts are done, The tekton resource files will be generated according to the promts given.
 Once the kubernetes environment is linked, run the yaml files or run the bash script pipeline-script.sh
 <br>The pipeline will be defined with the tasks as per the user promts. If the user need to apply the files manually, he need to install the tektons crds such as tekton-pipelines, tekton-tasks and dashboard. If the user opts for cloud provider, he need to configure the triggers. What tasks to be installed and how to add triggers will be provided in the readme file generated with the project.
+
+# to-do checklist (not in order)
+- [x] Add proper directory
+- [x] Add more tasks
+- [x] Change pipelines
+- [x] Add aws, azure, minikube auths
+- [x] Give options for trigger and event listeners
+- [x] Add secrets storing from different cloud providers
+- [x] Change to generator for accepting json from ui instead of user prompts in cli
+- [x] (Optional) Add Reusability of pipelines for similar languages
+- [x] Add proper error handling
+- [x] Add proper logging
