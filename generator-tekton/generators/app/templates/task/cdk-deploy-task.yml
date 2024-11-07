@@ -1,0 +1,69 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: cdk-deploy
+  namespace: <%= namespaceName %>
+spec:
+  params:
+    - name: commit_sha
+      type: string
+    - name: clone-dir
+      type: string
+    - name: AWS_ACCESS_KEY_ID
+      type: string
+    - name: AWS_SECRET_ACCESS_KEY
+      type: string
+    - name: AWS_SESSION_TOKEN
+    - name: repoUrl
+      type: string
+    - name: git-branch
+      type: string
+  workspaces:
+    - name: source
+  steps:
+    - name: deploy-cdk
+      image: node:20.11
+      script: |
+        export IMAGE_TAG=$(params.commit_sha)
+        export AWS_ACCESS_KEY_ID=$(params.AWS_ACCESS_KEY_ID)
+        export AWS_SECRET_ACCESS_KEY=$(params.AWS_SECRET_ACCESS_KEY)
+        export AWS_SESSION_TOKEN=$(params.AWS_SESSION_TOKEN)
+
+        # ls $(workspaces.aws-creds.path)
+        # Read AWS credentials from the Workspace
+        # export AWS_ACCESS_KEY_ID=$(cat $(workspaces.aws-creds.path)/AWS_ACCESS_KEY_ID)
+        # export AWS_SECRET_ACCESS_KEY=$(cat $(workspaces.aws-creds.path)/AWS_SECRET_ACCESS_KEY)
+        # export AWS_SESSION_TOKEN=$(cat $(workspaces.aws-creds.path)/AWS_SESSION_TOKEN)
+
+        export AWS_REGION='us-east-2'
+
+        npm install -g aws-cdk
+        cd /workspace/source/$(params.clone-dir)/$(params.clone-dir)-deploy/
+        npm install
+
+        # stack name and env needs to be put here dynamically
+
+        branchName=$(echo "$(params.git-branch)" | sed 's|^refs/heads/||')
+        case "$branchName" in
+          "development")
+            export ENV='dev'
+            ;;
+          "qa")
+            export ENV='qa1'
+            ;;
+          "staging")
+            export ENV='staging'
+            ;;
+          "master")
+            export ENV='production'
+            ;;
+          *)
+            echo "Unsupported branch: $(params.git-branch)"
+            exit 1
+            ;;
+        esac
+
+        echo "CDK changes performing on $ENV environment"
+        cdk bootstrap --context env=$ENV
+        cdk synth --context env=$ENV pp-$ENV-cashDeposits
+        cdk deploy --context env=$ENV pp-$ENV-cashDeposits --require-approval never

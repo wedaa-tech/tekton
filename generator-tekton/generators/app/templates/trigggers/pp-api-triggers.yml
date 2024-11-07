@@ -1,0 +1,173 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: pp-api-push-trigger-binding
+  namespace: <%= namespaceName %>
+spec:
+  params:
+    - name: revision
+      value: $(body.head_commit.id)
+    - name: repo-url
+      value: github.com/$(body.repository.full_name).git
+    - name: git-branch
+      value: $(body.ref)
+    - name: submodules
+      value: "false"
+    - name: dev-image-reference
+      value: 201771159450.dkr.ecr.us-east-2.amazonaws.com/tekton-testing
+    - name: clone-dir
+      value: "pp-api"
+
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: pp-api-push-trigger-template
+  namespace: <%= namespaceName %>
+spec:
+  params:
+    - name: revision
+      default: main
+    - name: repo-url
+    - name: dev-image-reference
+    - name: submodules
+    - name: git-branch
+    - name: clone-dir
+
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: pp-api-push-trigger-run-
+      spec:
+        serviceAccountName: tekton-service-account
+        pipelineRef:
+          name: pp-api-pipeline
+        podTemplate:
+          securityContext:
+            fsGroup: 65532
+        workspaces:
+          - name: shared-data
+            persistentVolumeClaim:
+              claimName: tekton-pvc
+          - name: docker-config
+            emptyDir: {}
+          - name: cache-dir
+            emptyDir: {}
+          - name: github-secret
+            secret:
+              secretName: github-secret
+        params:
+          - name: repo-url
+            value: $(tt.params.repo-url)
+          - name: revision
+            value: $(tt.params.revision)
+          - name: submodules
+            value: $(tt.params.submodules)
+          - name: dev-image-reference
+            value: $(tt.params.dev-image-reference)
+          - name: git-branch
+            value: $(tt.params.git-branch)
+          - name: clone-dir
+            value: $(tt.params.clone-dir)
+
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: pp-api-pr-trigger-binding
+  namespace: <%= namespaceName %>
+spec:
+  params:
+    - name: revision
+      value: $(body.pull_request.head.ref)
+    # - name: target-url
+    #   value: http://localhost:9097//#/namespaces/<%= namespaceName %>/pipelineruns/$(context.pipelineRun.name)
+    - name: repo-url
+      value: github.com/$(body.repository.full_name).git
+    - name: commit-sha
+      value: $(body.pull_request.head.sha)
+    - name: git-branch
+      value: $(body.pull_request.base.ref)
+    - name: head-branch
+      value: $(body.pull_request.head.ref)
+    - name: submodules
+      value: "false"
+    - name: dev-image-reference
+      value: 201771159450.dkr.ecr.us-east-2.amazonaws.com/pp-api-dev
+    - name: qa-image-reference
+      value: 201771159450.dkr.ecr.us-east-2.amazonaws.com/qa-tekton-repo
+    - name: staging-image-reference
+      value: 201771159450.dkr.ecr.us-east-2.amazonaws.com/staging-tekton-repo
+    - name: prod-image-reference
+      value: 675913897327.dkr.ecr.us-east-2.amazonaws.com/pp-cd-production
+    - name: clone-dir
+      value: "pp-api"
+
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: pp-api-pr-trigger-template
+  namespace: <%= namespaceName %>
+spec:
+  params:
+    - name: revision
+    - name: commit-sha
+    - name: repo-url
+    - name: submodules
+    - name: git-branch
+    - name: head-branch
+    - name: clone-dir
+    - name: dev-image-reference
+    - name: qa-image-reference
+    - name: staging-image-reference
+    - name: prod-image-reference
+
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: pp-api-pr-trigger-run-
+      spec:
+        serviceAccountName: tekton-service-account
+        pipelineRef:
+          name: pp-api-pr-test-cases
+        podTemplate:
+          securityContext:
+            fsGroup: 65532
+        workspaces:
+          - name: shared-data
+            persistentVolumeClaim:
+              claimName: tekton-pvc
+          - name: github-secret
+            secret:
+              secretName: github-secret
+          - name: docker-config
+            emptyDir: {}
+          - name: cache-dir
+            emptyDir: {}
+
+        params:
+          - name: repo-url
+            value: $(tt.params.repo-url)
+          - name: commit-sha
+            value: $(tt.params.commit-sha)
+          - name: revision
+            value: $(tt.params.revision)
+          - name: submodules
+            value: $(tt.params.submodules)
+          - name: git-branch
+            value: $(tt.params.git-branch)
+          - name: clone-dir
+            value: $(tt.params.clone-dir)
+          - name: head-branch
+            value: $(tt.params.head-branch)
+          - name: dev-image-reference
+            value: $(tt.params.dev-image-reference)
+          - name: qa-image-reference
+            value: $(tt.params.qa-image-reference)
+          - name: staging-image-reference
+            value: $(tt.params.staging-image-reference)
+          - name: prod-image-reference
+            value: $(tt.params.prod-image-reference)

@@ -1,0 +1,94 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: pp-eventlistener
+  namespace: <%= namespaceName %>
+spec:
+  resources:
+    kubernetesResource:
+      serviceType: LoadBalancer
+  serviceAccountName: tekton-service-account
+  triggers:
+    - name: push-trigger
+      interceptors:
+        - ref:
+            name: "github"
+          params:
+            - name: "secretRef"
+              value:
+                secretName: github-secret
+                secretKey: secretToken
+            - name: "eventTypes"
+              value: ["push"]
+        - ref:
+            name: "cel"
+          params:
+            - name: "filter"
+              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'premiumparking/pp-cash-deposits' && body.ref in ['refs/heads/development', 'refs/heads/qa', 'refs/heads/staging', 'refs/heads/master']"
+      bindings:
+        - ref: pp-cash-deposits-push-trigger-binding
+      template:
+        ref: pp-cash-deposits-trigger-template
+
+    - name: pr-trigger
+      interceptors:
+        - ref:
+            name: "github"
+          params:
+            - name: "secretRef"
+              value:
+                secretName: github-secret
+                secretKey: secretToken
+            - name: "eventTypes"
+              value: ["pull_request"]
+        - ref:
+            name: "cel"
+          params:
+            - name: "filter"
+              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == 'premiumparking/pp-cash-deposits' && body.action in ['opened', 'synchronize', 'reopened']"
+      bindings:
+        - ref: pp-cash-deposits-pr-trigger-binding
+      template:
+        ref: pp-cash-deposits-pr-trigger-template
+
+    - name: push-trigger
+      interceptors:
+        - ref:
+            name: "github"
+          params:
+            - name: "secretRef"
+              value:
+                secretName: github-secret
+                secretKey: secretToken
+            - name: "eventTypes"
+              value: ["push"]
+        - ref:
+            name: "cel"
+          params:
+            - name: "filter"
+              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'premiumparking/premium-parking-web-api' && body.ref in ['refs/heads/development', 'refs/heads/qa', 'refs/heads/staging', 'refs/heads/master', 'refs/heads/tekton']"
+      bindings:
+        - ref: pp-api-push-trigger-binding
+      template:
+        ref: pp-api-push-trigger-template
+
+    - name: pr-trigger
+      interceptors:
+        - ref:
+            name: "github"
+          params:
+            - name: "secretRef"
+              value:
+                secretName: github-secret
+                secretKey: secretToken
+            - name: "eventTypes"
+              value: ["pull_request"]
+        - ref:
+            name: "cel"
+          params:
+            - name: "filter"
+              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == 'premiumparking/premium-parking-web-api' && body.action in ['opened', 'synchronize', 'reopened']"
+      bindings:
+        - ref: pp-api-pr-trigger-binding
+      template:
+        ref: pp-api-pr-trigger-template

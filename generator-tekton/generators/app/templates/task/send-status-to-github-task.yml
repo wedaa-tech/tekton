@@ -1,0 +1,60 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: send-status-to-github
+  namespace: <%= namespaceName %>
+spec:
+  params:
+    - name: repo-url
+      type: string
+    # - name: target-url (Commented out, or remove if not needed)
+    - name: commit-sha
+      type: string
+    - name: test-status
+      type: string
+    - name: coverage
+      type: string
+    - name: test-summary
+      type: string
+  workspaces:
+    - name: source
+    - name: github-secret
+  steps:
+    - name: send-status
+      image: curlimages/curl:7.76.1
+      script: |
+        # Fetch the GitHub token from the secret or define it directly
+        GITHUB_TOKEN=$(cat /github/creds/secretToken)
+
+        REPO_URL=$(echo $(params.repo-url) | sed 's|github.com/||; s|.git$||')
+        # TARGET_URL="http://localhost:9097//#/namespaces/<%= namespaceName %>/pipelineruns/$(context.pipelineRun.name)?pipelineTask=test-cases"
+        commit_sha=$(params.commit-sha)
+        TEST_STATUS=$(params.test-status)
+        COVERAGE=$(params.coverage)
+        # TEST_SUMMARY=$(params.test-summary)
+
+        # Determine the state
+        if [ "$TEST_STATUS" -eq 0 ]; then
+          STATE="success"
+          DESCRIPTION="The Test cases passed $(params.test-summary)"
+        else
+          STATE="failure"
+          DESCRIPTION="The test cases failed!: $(params.test-summary)"
+        fi
+
+        # Create the commit status
+          curl -L -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer $GITHUB_TOKEN" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/$REPO_URL/statuses/$commit_sha \
+          -d "{\"state\": \"$STATE\", \"target_url\": \"$TARGET_URL\", \"description\": \"$DESCRIPTION\", \"context\": \"pr-test-run-\"}"
+
+      volumeMounts:
+        - name: github-secret
+          mountPath: /github/creds
+          readOnly: true
+  volumes:
+    - name: github-secret
+      secret:
+        secretName: github-secret

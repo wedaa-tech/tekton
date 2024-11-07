@@ -67,4 +67,6 @@ Once the kubernetes environment is linked, run the yaml files or run the bash sc
 - [x] (Optional) Add Reusability of pipelines for similar languages
 - [x] Add proper error handling
 - [x] Add proper logging
-ef
+
+
+AWSIRSAKaniko-role

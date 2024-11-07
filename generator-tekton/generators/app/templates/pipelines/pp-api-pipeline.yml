@@ -1,0 +1,127 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pp-api-pipeline
+  namespace: <%= namespaceName %>
+spec:
+  description: |
+    This pipeline clones a git repo, builds a Docker image with Kaniko and
+    pushes it to a registry
+  params:
+    - name: repo-url
+      type: string
+    - name: revision
+      type: string
+    - name: submodules
+      type: string
+    - name: dev-image-reference
+      type: string
+    - name: git-branch
+      type: string
+    - name: clone-dir
+      type: string
+
+  workspaces:
+    - name: github-secret
+    - name: shared-data
+    - name: docker-config
+    - name: cache-dir
+
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: clone-repo
+      workspaces:
+        - name: source
+          workspace: shared-data
+        - name: github-secret
+          workspace: github-secret
+      params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: submodules
+          value: $(params.submodules)
+        - name: git-branch
+          value: $(params.git-branch)
+        - name: clone-dir
+          value: $(params.clone-dir)
+
+    # - name: test-cases
+    #   runAfter: ["fetch-source"]
+    #   taskRef:
+    #     name: test-cases
+    #   workspaces:
+    #     - name: source
+    #       workspace: shared-data
+
+    - name: get-commit-sha
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: get-commit-sha
+      workspaces:
+        - name: source
+          workspace: shared-data
+      params:
+        - name: clone-dir
+          value: "$(params.clone-dir)"
+
+    - name: aws-auth
+      runAfter: ["get-commit-sha"]
+      taskRef:
+        name: install-aws-cli-and-auth
+      workspaces:
+        - name: source
+          workspace: shared-data
+        - name: docker-config
+          workspace: docker-config
+      params:
+        - name: commit_sha
+          value: "$(tasks.get-commit-sha.results.commit-sha)"
+        - name: clone-dir
+          value: "$(params.clone-dir)"
+        - name: git-branch
+          value: $(params.git-branch)
+
+    - name: build-push
+      runAfter: ["aws-auth"]
+      taskRef:
+        name: build-and-push-kaniko
+      workspaces:
+        - name: source
+          workspace: shared-data
+        - name: docker-config
+          workspace: docker-config
+        - name: cache-dir
+          workspace: cache-dir
+      params:
+        - name: repoUrl
+          value: $(tasks.aws-auth.results.repoUrl)
+        - name: clone-dir
+          value: "$(params.clone-dir)"
+        - name: commit_sha
+          value: "$(tasks.get-commit-sha.results.commit-sha)"
+
+    # - name: cdk-deploy
+    #   runAfter: ["build-push"]
+    #   workspaces:
+    #     - name: source
+    #       workspace: shared-data
+    #   taskSpec:
+    #     params:
+    #       - name: commit_sha
+    #         type: string
+    #     steps:
+    #       - name: install-npm-aws-cdk
+    #         image: node:20.11
+    #         script: |
+    #           export image_TAG=$(params.commit_sha)
+    #           npm install -g aws-cdk
+    #           cd /workspace/source/Deployment
+    #           npm install
+    #           cdk synth --context env=dev pp-dev-DeployStack
+    #           cdk deploy --context env=dev pp-dev-DeployStack --require-approval never
+    #   params:
+    #     - name: commit_sha
+    #       value: "$(tasks.get-commit-sha.results.commit-sha)"

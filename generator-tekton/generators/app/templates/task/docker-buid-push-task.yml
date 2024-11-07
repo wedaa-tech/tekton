@@ -1,0 +1,132 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: install-aws-cli-and-auth
+  namespace: <%= namespaceName %>
+spec:
+  params:
+    - name: dev-image
+      type: string
+    - name: qa-image
+      type: string
+    - name: staging-image
+      type: string
+    - name: prod-image
+      type: string
+    - name: git-branch
+      type: string
+  workspaces:
+    - name: source
+    - name: docker-config
+    # - name: aws-creds
+  results:
+    - name: AWS_ACCESS_KEY_ID
+    - name: AWS_SECRET_ACCESS_KEY
+    - name: AWS_SESSION_TOKEN
+    - name: repoUrl
+  steps:
+    - name: install-aws-cli
+      image: amazonlinux
+      script: |
+        yum install -y unzip
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip > /dev/null 2>&1
+        ./aws/install
+        yum install -y docker jq
+        aws --version
+        docker --version
+        branchName=$(echo "$(params.git-branch)" | sed 's|^refs/heads/||')
+
+
+        if [ "$branchName" = "master" ]; then
+          export roleArn='arn:aws:iam::675913897327:role/Sandbok-Tekton-eks-role'
+          export sessionName='tekton-prod-session'
+          export ecrRegion='us-east-2'
+          export repoUrl='$(params.prod-image)'
+        else
+          export roleArn='arn:aws:iam::201771159450:role/Sandbok-Tekton-eks-role'
+          export sessionName='tekton-session'
+          export ecrRegion='us-east-2'
+
+          case "$branchName" in
+            "development")
+              export repoUrl='$(params.dev-image)'
+              ;;
+            "qa")
+              export repoUrl='$(params.qa-image)'
+              ;;
+            "staging")
+              export repoUrl='$(params.staging-image)'
+              ;;
+            *)
+              echo "Unsupported branch: $(params.git-branch)"
+              exit 1
+              ;;
+          esac
+        fi
+
+        CREDS=$(aws sts assume-role \
+          --role-arn $roleArn \
+          --role-session-name $sessionName \
+          --region $ecrRegion \
+          --output json)
+
+        export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
+        export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
+        export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
+
+
+        printf "%s" "$AWS_ACCESS_KEY_ID" > /tekton/results/AWS_ACCESS_KEY_ID
+        printf "%s" "$AWS_SECRET_ACCESS_KEY" > /tekton/results/AWS_SECRET_ACCESS_KEY
+        printf "%s" "$AWS_SESSION_TOKEN" > /tekton/results/AWS_SESSION_TOKEN
+
+        # mkdir -p $(workspaces.aws-creds.path)
+        # printf "%s" "$AWS_ACCESS_KEY_ID" > $(workspaces.aws-creds.path)/AWS_ACCESS_KEY_ID
+        # printf "%s" "$AWS_SECRET_ACCESS_KEY" > $(workspaces.aws-creds.path)/AWS_SECRET_ACCESS_KEY
+        # printf "%s" "$AWS_SESSION_TOKEN" > $(workspaces.aws-creds.path)/AWS_SESSION_TOKEN
+
+        ls $(workspaces.aws-creds.path)
+
+        printf "%s" "$repoUrl" > /tekton/results/repoUrl
+  volumes:
+    - name: docker-config
+      emptyDir: {}
+
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-and-push-kaniko
+  namespace: <%= namespaceName %>
+spec:
+  params:
+    - name: repoUrl
+      type: string
+    - name: clone-dir
+      type: string
+    - name: commit_sha
+      type: string
+  workspaces:
+    - name: source
+    - name: docker-config
+    - name: cache-dir
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:latest
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
+      args:
+        - "--dockerfile=./Dockerfile"
+        - "--context=/workspace/source/$(params.clone-dir)/"
+        - "--destination=$(params.repoUrl):$(params.commit_sha)"
+        - "--cache=true"
+        - "--cache-repo=$(params.repoUrl)"
+        - "--cache-dir=/cache"
+        - "--cache-run-layers"
+        - "--cache-copy-layers"
+  volumes:
+    - name: docker-config
+      emptyDir: {}
+    - name: cache-dir
+      emptyDir: {}
