@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: pp-api-pipeline
+  name: <%= ComponentName %>-pipeline
   namespace: <%= namespaceName %>
 spec:
   description: |
@@ -14,19 +14,20 @@ spec:
       type: string
     - name: submodules
       type: string
-    - name: dev-image-reference
+    - name: image-reference
       type: string
     - name: git-branch
       type: string
-    - name: clone-dir
+    - name: auther
       type: string
+    
 
   workspaces:
     - name: github-secret
     - name: shared-data
     - name: docker-config
     - name: cache-dir
-
+    
   tasks:
     - name: fetch-source
       taskRef:
@@ -45,16 +46,23 @@ spec:
           value: $(params.submodules)
         - name: git-branch
           value: $(params.git-branch)
+        - name: auther
+          vlaue: $(params.auther)
+       
+
+    - name: test-cases
+      onError: continue
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: cash-deposits-test-cases
+      workspaces:
+        - name: source
+          workspace: shared-data
+      params:
         - name: clone-dir
           value: $(params.clone-dir)
-
-    # - name: test-cases
-    #   runAfter: ["fetch-source"]
-    #   taskRef:
-    #     name: test-cases
-    #   workspaces:
-    #     - name: source
-    #       workspace: shared-data
+        - name: git-branch
+          value: $(params.git-branch)
 
     - name: get-commit-sha
       runAfter: ["fetch-source"]
@@ -76,11 +84,10 @@ spec:
           workspace: shared-data
         - name: docker-config
           workspace: docker-config
+      
       params:
-        - name: commit_sha
-          value: "$(tasks.get-commit-sha.results.commit-sha)"
-        - name: clone-dir
-          value: "$(params.clone-dir)"
+        - name: image
+          value: $(params.image-reference)
         - name: git-branch
           value: $(params.git-branch)
 
@@ -103,25 +110,26 @@ spec:
         - name: commit_sha
           value: "$(tasks.get-commit-sha.results.commit-sha)"
 
-    # - name: cdk-deploy
-    #   runAfter: ["build-push"]
-    #   workspaces:
-    #     - name: source
-    #       workspace: shared-data
-    #   taskSpec:
-    #     params:
-    #       - name: commit_sha
-    #         type: string
-    #     steps:
-    #       - name: install-npm-aws-cdk
-    #         image: node:20.11
-    #         script: |
-    #           export image_TAG=$(params.commit_sha)
-    #           npm install -g aws-cdk
-    #           cd /workspace/source/Deployment
-    #           npm install
-    #           cdk synth --context env=dev pp-dev-DeployStack
-    #           cdk deploy --context env=dev pp-dev-DeployStack --require-approval never
-    #   params:
-    #     - name: commit_sha
-    #       value: "$(tasks.get-commit-sha.results.commit-sha)"
+    - name: cdk-deploy
+      runAfter: ["build-push"]
+      workspaces:
+        - name: source
+          workspace: shared-data
+       
+      taskRef:
+        name: cdk-deploy
+      params:
+        - name: commit_sha
+          value: "$(tasks.get-commit-sha.results.commit-sha)"
+        - name: git-branch
+          value: $(params.git-branch)
+        - name: AWS_ACCESS_KEY_ID
+          value: "$(tasks.aws-auth.results.AWS_ACCESS_KEY_ID)"
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "$(tasks.aws-auth.results.AWS_SECRET_ACCESS_KEY)"
+        - name: AWS_SESSION_TOKEN
+          value: "$(tasks.aws-auth.results.AWS_SESSION_TOKEN)"
+        - name: repoUrl
+          value: "$(tasks.aws-auth.results.repoUrl)"
+        - name: clone-dir
+          value: "$(params.clone-dir)"

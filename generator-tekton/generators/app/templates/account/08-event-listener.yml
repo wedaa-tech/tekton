@@ -24,11 +24,11 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              # value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'premiumparking/<%= ComponentName %>-cash-deposits' && body.ref in ['refs/heads/development', 'refs/heads/qa', 'refs/heads/staging', 'refs/heads/master']"
+              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name && body.ref in ['refs/heads/development', 'refs/heads/qa', 'refs/heads/staging', 'refs/heads/master']"
       bindings:
         - ref: <%= ComponentName %>-push-trigger-binding
       template:
-        ref: <%= ComponentName %>-trigger-template
+        ref: <%= ComponentName %>-push-trigger-template
 
     - name: pr-trigger
       interceptors:
@@ -45,50 +45,10 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              # value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == 'premiumparking/<%= ComponentName %>-cash-deposits' && body.action in ['opened', 'synchronize', 'reopened']"
+              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name  && body.action in ['opened', 'synchronize', 'reopened']"
       bindings:
         - ref: <%= ComponentName %>-pr-trigger-binding
       template:
         ref: <%= ComponentName %>-pr-trigger-template
 
-    # - name: push-trigger
-    #   interceptors:
-    #     - ref:
-    #         name: "github"
-    #       params:
-    #         - name: "secretRef"
-    #           value:
-    #             secretName: github-secret
-    #             secretKey: secretToken
-    #         - name: "eventTypes"
-    #           value: ["push"]
-    #     - ref:
-    #         name: "cel"
-    #       params:
-    #         - name: "filter"
-    #           # value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'premiumparking/premium-parking-web-api' && body.ref in ['refs/heads/development', 'refs/heads/qa', 'refs/heads/staging', 'refs/heads/master', 'refs/heads/tekton']"
-    #   bindings:
-    #     - ref: <%= ComponentName %>-push-trigger-binding
-    #   template:
-    #     ref: <%= ComponentName %>-push-trigger-template
-
-    # - name: pr-trigger
-    #   interceptors:
-    #     - ref:
-    #         name: "github"
-    #       params:
-    #         - name: "secretRef"
-    #           value:
-    #             secretName: github-secret
-    #             secretKey: secretToken
-    #         - name: "eventTypes"
-    #           value: ["pull_request"]
-    #     - ref:
-    #         name: "cel"
-    #       params:
-    #         - name: "filter"
-    #           # value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == 'premiumparking/premium-parking-web-api' && body.action in ['opened', 'synchronize', 'reopened']"
-    #   bindings:
-    #     - ref: <%= ComponentName %>-pr-trigger-binding
-    #   template:
-    #     ref: <%= ComponentName %>-pr-trigger-template
+   

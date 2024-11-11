@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: pp-cash-deposits-pr-test-cases
+  name: <%= ComponentName %>-pr-test-cases
   namespace: <%= namespaceName %>
 spec:
   params:
@@ -15,7 +15,7 @@ spec:
       type: string
     - name: git-branch
       type: string
-    - name: clone-dir
+    - name: auther
       type: string
 
   workspaces:
@@ -40,8 +40,8 @@ spec:
           value: $(params.submodules)
         - name: git-branch
           value: $(params.git-branch)
-        - name: clone-dir
-          value: $(params.clone-dir)
+        - name: auther
+          value: $(params.auther)
           
     - name: get-commit-sha
       runAfter: ["fetch-source"]

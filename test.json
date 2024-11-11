@@ -1,21 +1,7 @@
 {
     "githubpattoken": "pat token  encoded in base64",
-    "git name": "rfsdvf",
     "namespaceName": "<value>",
-    "pipelineName": "<value>",
-    "dockerConfig": "<value>",
-    "repoURL": "<value>",
-    "repoType": "<value>",
-    "branch": "<value>",
-    "imageRepositoryURL": "<value>",
-    "deployKey": "<value>",
-    "sshConfig": "<value>",
-    "buildStrategy": "<value>",
-    "PathToPomFile": "<value>",
-    "k8sEnvironment": "<value>",
-    "PathtoContext": "<value>",
-    "DockerfilePath": "<value>",
-    "PathtoDockerfile": "<value>",
-    "SonarQube": "<value>"
+    "componentName": "<value>",
+    "imageUri": "<value>"
   }
   

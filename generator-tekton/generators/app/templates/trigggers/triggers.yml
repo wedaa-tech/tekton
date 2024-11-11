@@ -1,59 +1,49 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: pp-cash-deposits-push-trigger-binding
+  name: <%= ComponentName %>-push-trigger-binding
   namespace: <%= namespaceName %>
 spec:
   params:
-    - name: revision
-      value: $(body.head_commit.id)
     - name: repo-url
       value: github.com/$(body.repository.full_name).git
-    - name: git-branch
-      value: $(body.ref)
+    - name: revision
+      value: $(body.head_commit.id)
+    - name: auther
+      value: $(body.head_commit.author.name)
     - name: submodules
       value: "false"
-    - name: dev-image-reference
-      value: 201771159450.dkr.ecr.us-east-2.amazonaws.com/pp-cd-dev
-    - name: qa-image-reference
-      value: 201771159450.dkr.ecr.us-east-2.amazonaws.com/qa-tekton-repo
-    - name: staging-image-reference
-      value: 201771159450.dkr.ecr.us-east-2.amazonaws.com/pp-cd-staging
-    - name: prod-image-reference
-      value: 675913897327.dkr.ecr.us-east-2.amazonaws.com/pp-cd-production
-    - name: clone-dir
-      value: "pp-cash-deposits"
-      # remove this param, as it needs to be generated dynamically
+    - name: git-branch
+      value: $(body.ref)    
+    - name: image-reference
+      value: <%= imageUri %>      
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: pp-cash-deposits-trigger-template
+  name: <%= ComponentName %>-push-trigger-template
   namespace: <%= namespaceName %>
 spec:
   params:
+    - name: repo-url
     - name: revision
       default: main
-    - name: repo-url
-    - name: dev-image-reference
-    - name: qa-image-reference
-    - name: staging-image-reference
-    - name: prod-image-reference
     - name: submodules
     - name: git-branch
-    - name: clone-dir
-    - name: stack-name
+    - name: auther
+    - name: image-reference
+    
 
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: pp-cash-deposits-push-trigger-run-
+        generateName: <%= ComponentName %>-push-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: pp-cash-deposits-pipeline
+          name: <%= ComponentName %>-pipeline
         podTemplate:
           securityContext:
             fsGroup: 65532
@@ -75,33 +65,24 @@ spec:
             value: $(tt.params.revision)
           - name: submodules
             value: $(tt.params.submodules)
-          - name: dev-image-reference
-            value: $(tt.params.dev-image-reference)
-          - name: qa-image-reference
-            value: $(tt.params.qa-image-reference)
-          - name: staging-image-reference
-            value: $(tt.params.staging-image-reference)
-          - name: prod-image-reference
-            value: $(tt.params.prod-image-reference)
+          - name: image-reference
+            value: $(tt.params.image-reference)
           - name: git-branch
             value: $(tt.params.git-branch)
-          - name: clone-dir
-            value: $(tt.params.clone-dir)
-          - name: stack-name
-            value: $(tt.params.stack-name)
+          - name: auther
+            value: $(tt.params.auther)
+    
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: pp-cash-deposits-pr-trigger-binding
+  name: <%= ComponentName %>-pr-trigger-binding
   namespace: <%= namespaceName %>
 spec:
   params:
     - name: revision
       value: $(body.pull_request.head.ref)
-    # - name: target-url
-    #   value: http://localhost:9097//#/namespaces/<%= namespaceName %>/pipelineruns/$(context.pipelineRun.name)
     - name: repo-url
       value: github.com/$(body.repository.full_name).git
     - name: commit-sha
@@ -110,36 +91,35 @@ spec:
       value: $(body.pull_request.head.ref)
     - name: submodules
       value: "false"
-    - name: dev-image-reference
-      value: 201771159450.dkr.ecr.us-east-2.amazonaws.com/tekton-testing
-    - name: clone-dir
-      value: "pp-cash-deposits"
+    - name: image-reference
+      value: <%= imageUri %>
+ 
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: pp-cash-deposits-pr-trigger-template
+  name: <%= ComponentName %>-pr-trigger-template
   namespace: <%= namespaceName %>
 spec:
   params:
     - name: revision
     - name: commit-sha
     - name: repo-url
-    - name: dev-image-reference
+    - name: image-reference
     - name: submodules
     - name: git-branch
-    - name: clone-dir
+  
 
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: pp-cash-deposits-pr-trigger-run-
+        generateName: <%= ComponentName %>-pr-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: pp-cash-deposits-pr-test-cases
+          name: <%= ComponentName %>-pr-test-cases
         podTemplate:
           securityContext:
             fsGroup: 65532
@@ -162,5 +142,4 @@ spec:
             value: $(tt.params.submodules)
           - name: git-branch
             value: $(tt.params.git-branch)
-          - name: clone-dir
-            value: $(tt.params.clone-dir)
+       

@@ -15,9 +15,9 @@ spec:
       type: string
     - name: git-branch
       type: string
-    - name: clone-dir
+    - name: auther
       type: string
-
+    
   workspaces:
     - name: source
     - name: github-secret
@@ -27,8 +27,8 @@ spec:
       script: |
         #!/bin/sh
         GITHUB_TOKEN=$(cat /github/creds/secretToken)
-        branch=$( [ "$(params.clone-dir)" == "core_API_Automation" ] && echo "main" || echo $(echo $(params.git-branch) | sed 's|refs/heads/||') )
-        repo_dir="/workspace/source/$(params.clone-dir)"
+        branch=$($(params.git-branch) | sed 's|refs/heads/||') )
+        repo_dir="/workspace/source/<%= ComponentName %>
         rm -rf $repo_dir
 
         if [ -d "$repo_dir/.git" ]; then
