@@ -9,11 +9,11 @@ ORG="your_org_name"   # Optional: specify if you're creating under an organizati
 # Array of repositories to create with name and description
 # Add each repository name and description as elements
 REPOS=(
-  "<%= ComponentName %>:go"
-  "<%= ComponentName %>:spring"
-  "<%= ComponentName %>:python"
-  "<%= ComponentName %>:react"
-  "<%= ComponentName %>:angular"
+  "<%= componentName %>:go"
+  "<%= componentName %>:spring"
+  "<%= componentName %>:python"
+  "<%= componentName %>:react"
+  "<%= componentName %>:angular"
 )
 
 # GitHub API endpoint

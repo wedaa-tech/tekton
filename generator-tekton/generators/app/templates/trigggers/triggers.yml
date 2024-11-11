@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: <%= ComponentName %>-push-trigger-binding
+  name: <%= componentName %>-push-trigger-binding
   namespace: <%= namespaceName %>
 spec:
   params:
@@ -9,7 +9,7 @@ spec:
       value: github.com/$(body.repository.full_name).git
     - name: revision
       value: $(body.head_commit.id)
-    - name: auther
+    - name: author
       value: $(body.head_commit.author.name)
     - name: submodules
       value: "false"
@@ -22,7 +22,7 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: <%= ComponentName %>-push-trigger-template
+  name: <%= componentName %>-push-trigger-template
   namespace: <%= namespaceName %>
 spec:
   params:
@@ -31,7 +31,7 @@ spec:
       default: main
     - name: submodules
     - name: git-branch
-    - name: auther
+    - name: author
     - name: image-reference
     
 
@@ -39,11 +39,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: <%= ComponentName %>-push-trigger-run-
+        generateName: <%= componentName %>-push-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: <%= ComponentName %>-pipeline
+          name: <%= componentName %>-pipeline
         podTemplate:
           securityContext:
             fsGroup: 65532
@@ -69,15 +69,15 @@ spec:
             value: $(tt.params.image-reference)
           - name: git-branch
             value: $(tt.params.git-branch)
-          - name: auther
-            value: $(tt.params.auther)
+          - name: author
+            value: $(tt.params.author)
     
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: <%= ComponentName %>-pr-trigger-binding
+  name: <%= componentName %>-pr-trigger-binding
   namespace: <%= namespaceName %>
 spec:
   params:
@@ -99,7 +99,7 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: <%= ComponentName %>-pr-trigger-template
+  name: <%= componentName %>-pr-trigger-template
   namespace: <%= namespaceName %>
 spec:
   params:
@@ -115,11 +115,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: <%= ComponentName %>-pr-trigger-run-
+        generateName: <%= componentName %>-pr-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: <%= ComponentName %>-pr-test-cases
+          name: <%= componentName %>-pr-test-cases
         podTemplate:
           securityContext:
             fsGroup: 65532

@@ -15,7 +15,7 @@ spec:
       type: string
     - name: git-branch
       type: string
-    - name: auther
+    - name: author
       type: string
     
   workspaces:
@@ -28,7 +28,7 @@ spec:
         #!/bin/sh
         GITHUB_TOKEN=$(cat /github/creds/secretToken)
         branch=$($(params.git-branch) | sed 's|refs/heads/||') )
-        repo_dir="/workspace/source/<%= ComponentName %>
+        repo_dir="/workspace/source/<%= componentName %>
         rm -rf $repo_dir
 
         if [ -d "$repo_dir/.git" ]; then

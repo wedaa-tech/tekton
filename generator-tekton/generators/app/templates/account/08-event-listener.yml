@@ -26,9 +26,9 @@ spec:
             - name: "filter"
               value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name && body.ref in ['refs/heads/development', 'refs/heads/qa', 'refs/heads/staging', 'refs/heads/master']"
       bindings:
-        - ref: <%= ComponentName %>-push-trigger-binding
+        - ref: <%= componentName %>-push-trigger-binding
       template:
-        ref: <%= ComponentName %>-push-trigger-template
+        ref: <%= componentName %>-push-trigger-template
 
     - name: pr-trigger
       interceptors:
@@ -47,8 +47,8 @@ spec:
             - name: "filter"
               value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name  && body.action in ['opened', 'synchronize', 'reopened']"
       bindings:
-        - ref: <%= ComponentName %>-pr-trigger-binding
+        - ref: <%= componentName %>-pr-trigger-binding
       template:
-        ref: <%= ComponentName %>-pr-trigger-template
+        ref: <%= componentName %>-pr-trigger-template
 
    

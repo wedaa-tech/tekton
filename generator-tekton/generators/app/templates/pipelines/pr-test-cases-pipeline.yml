@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: <%= ComponentName %>-pr-test-cases
+  name: <%= componentName %>-pr-test-cases
   namespace: <%= namespaceName %>
 spec:
   params:
@@ -15,7 +15,7 @@ spec:
       type: string
     - name: git-branch
       type: string
-    - name: auther
+    - name: author
       type: string
 
   workspaces:
@@ -40,8 +40,8 @@ spec:
           value: $(params.submodules)
         - name: git-branch
           value: $(params.git-branch)
-        - name: auther
-          value: $(params.auther)
+        - name: author
+          value: $(params.author)
           
     - name: get-commit-sha
       runAfter: ["fetch-source"]
