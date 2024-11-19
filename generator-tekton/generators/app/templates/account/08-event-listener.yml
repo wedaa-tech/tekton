@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: <%= ProjectName %>-eventlistener
+  name: <%= projectName %>-eventlistener
   namespace: <%= namespaceName %>
 spec:
   resources:
@@ -24,7 +24,7 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name && body.ref in ['refs/heads/development', 'refs/heads/qa', 'refs/heads/staging', 'refs/heads/master']"
+              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'github org name/<%= componentName %>'"
       bindings:
         - ref: <%= componentName %>-push-trigger-binding
       template:
@@ -45,7 +45,7 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name  && body.action in ['opened', 'synchronize', 'reopened']"
+              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == 'github org name/<%= componentName %>' && body.action in ['opened', 'synchronize', 'reopened']"
       bindings:
         - ref: <%= componentName %>-pr-trigger-binding
       template:

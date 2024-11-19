@@ -2,6 +2,9 @@
     "githubpattoken": "pat token  encoded in base64",
     "namespaceName": "<value>",
     "componentName": "<value>",
-    "imageUri": "<value>"
+    "imageUri": "<value>",
+    "projectName": "<value>",
+    "dockerConfig": ""
   }
   
+

@@ -17,6 +17,8 @@ spec:
       type: string
     - name: author
       type: string
+    - name: clone-dir
+      type: string
 
   workspaces:
     - name: shared-data

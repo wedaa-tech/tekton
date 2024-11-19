@@ -20,8 +20,8 @@ spec:
     - name: fetch-sha
       image: alpine/git
       script: |
-        cd /workspace/source/<%= componentName %>
-        git config --global --add safe.directory /workspace/source/<%= componentName %>
+        cd /workspace/source/$(params.clone-dir)
+        git config --global --add safe.directory /workspace/source/$(params.clone-dir)
         commit_id=$(git rev-parse HEAD)
         printf "%s" "$commit_id" > /tekton/results/commit-sha
         author=$(git log -1 --pretty=format:'%an')

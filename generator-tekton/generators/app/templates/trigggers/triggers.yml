@@ -16,7 +16,9 @@ spec:
     - name: git-branch
       value: $(body.ref)    
     - name: image-reference
-      value: <%= imageUri %>      
+      value: <%= imageUri %>   
+    - name: clone-dir
+      value: $(body.repository.full_name)   
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
@@ -33,6 +35,7 @@ spec:
     - name: git-branch
     - name: author
     - name: image-reference
+    - name: clone-dir
     
 
   resourcetemplates:
@@ -93,6 +96,8 @@ spec:
       value: "false"
     - name: image-reference
       value: <%= imageUri %>
+    - name: clone-dir
+      value: $(body.repository.full_name)
  
 
 ---
@@ -109,6 +114,7 @@ spec:
     - name: image-reference
     - name: submodules
     - name: git-branch
+    - name: clone-dir
   
 
   resourcetemplates:

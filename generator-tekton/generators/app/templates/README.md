@@ -120,3 +120,8 @@ You can now open the Dashboard in your browser at <a href="http://localhost:9097
 
 <h3>For more information on Tekton, visit <a href="https://tekton.dev/docs/">https://tekton.dev/docs/</a></h3>
 <h3>For more information on Tekton Hub, visit <a href="https://hub.tekton.dev/">https://hub.tekton.dev/</a>
+
+
+test cases commands for evenry component
+docker build task 
+deployment task  
