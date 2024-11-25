@@ -1,0 +1,30 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: get-commit-sha
+  namespace: ferferfe
+spec:
+  params:
+    - name: clone-dir
+      type: string
+  workspaces:
+    - name: source
+  results:
+    - name: commit-sha
+      description: The commit SHA of the fetched source
+    - name: author
+      description: The author of the latest commit
+    - name: pr-author
+      description: The author of the pr
+  steps:
+    - name: fetch-sha
+      image: alpine/git
+      script: |
+        cd /workspace/source/$(params.clone-dir)
+        git config --global --add safe.directory /workspace/source/$(params.clone-dir)
+        commit_id=$(git rev-parse HEAD)
+        printf "%s" "$commit_id" > /tekton/results/commit-sha
+        author=$(git log -1 --pretty=format:'%an')
+        printf "%s" "$author" > /tekton/results/author
+
+       

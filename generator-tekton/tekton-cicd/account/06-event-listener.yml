@@ -1,8 +1,8 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: <%= projectName %>-eventlistener
-  namespace: <%= namespaceName %>
+  name: eferg-eventlistener
+  namespace: ferferfe
 spec:
   resources:
     kubernetesResource:
@@ -24,11 +24,11 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'github org name/<%= componentName %>'"
+              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'dsvafdddddf/*'"
       bindings:
-        - ref: <%= componentName %>-push-trigger-binding
+        - ref: trggrt-push-trigger-binding
       template:
-        ref: <%= componentName %>-push-trigger-template
+        ref: trggrt-push-trigger-template
 
     - name: pr-trigger
       interceptors:
@@ -45,10 +45,10 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == 'github org name/<%= componentName %>' && body.action in ['opened', 'synchronize', 'reopened']"
+              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == 'dsvafdddddf/*' && body.action in ['opened', 'synchronize', 'reopened']"
       bindings:
-        - ref: <%= componentName %>-pr-trigger-binding
+        - ref: trggrt-pr-trigger-binding
       template:
-        ref: <%= componentName %>-pr-trigger-template
+        ref: trggrt-pr-trigger-template
 
    

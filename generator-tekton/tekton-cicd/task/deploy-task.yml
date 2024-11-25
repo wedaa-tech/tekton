@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: cdk-deploy
-  namespace: <%= namespaceName %>
+  namespace: ferferfe
 spec:
   params:
     - name: AWS_ACCESS_KEY_ID
@@ -16,7 +16,6 @@ spec:
     - name: deploy-cdk
       image: node:20.11
       script: |
-        <%_ if (cloudProvider == "aws") { _%>
         export IMAGE_TAG=$(params.commit_sha)
         export AWS_ACCESS_KEY_ID=$(params.AWS_ACCESS_KEY_ID)
         export AWS_SECRET_ACCESS_KEY=$(params.AWS_SECRET_ACCESS_KEY)
@@ -26,8 +25,4 @@ spec:
         aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
 
         kubectl apply -f "files directory path"
-        <%_ } _%>
         
-        <%_ if (cloudProvider == "azure") { _%>
-        sdvfdbvd
-        <%_ } _%>

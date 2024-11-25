@@ -1,8 +1,8 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: <%= componentName %>-push-trigger-binding
-  namespace: <%= namespaceName %>
+  name: trggrt-push-trigger-binding${TOKEN}
+  namespace: ferferfe
 spec:
   params:
     - name: repo-url
@@ -16,7 +16,7 @@ spec:
     - name: git-branch
       value: $(body.ref)    
     - name: image-reference
-      value: <%= imageUri %>   
+      value: grewge   
     - name: clone-dir
       value: $(body.repository.full_name)   
 
@@ -24,8 +24,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: <%= componentName %>-push-trigger-template
-  namespace: <%= namespaceName %>
+  name: trggrt-push-trigger-template
+  namespace: ferferfe
 spec:
   params:
     - name: repo-url
@@ -42,11 +42,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: <%= componentName %>-push-trigger-run-
+        generateName: trggrt-push-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: <%= componentName %>-pipeline
+          name: trggrt-pipeline
         podTemplate:
           securityContext:
             fsGroup: 65532
@@ -54,13 +54,12 @@ spec:
           - name: shared-data
             persistentVolumeClaim:
               claimName: tekton-pvc
-          - name: docker-config
-            emptyDir: {}
-          - name: cache-dir
-            emptyDir: {}
           - name: github-secret
             secret:
               secretName: github-secret
+          - name: docker-credentials
+            secret:
+              secretName: docker-credentials
         params:
           - name: repo-url
             value: $(tt.params.repo-url)
@@ -80,8 +79,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: <%= componentName %>-pr-trigger-binding
-  namespace: <%= namespaceName %>
+  name: trggrt-pr-trigger-binding
+  namespace: ferferfe
 spec:
   params:
     - name: revision
@@ -95,7 +94,7 @@ spec:
     - name: submodules
       value: "false"
     - name: image-reference
-      value: <%= imageUri %>
+      value: grewge
     - name: clone-dir
       value: $(body.repository.full_name)
  
@@ -104,8 +103,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: <%= componentName %>-pr-trigger-template
-  namespace: <%= namespaceName %>
+  name: trggrt-pr-trigger-template
+  namespace: ferferfe
 spec:
   params:
     - name: revision
@@ -121,11 +120,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: <%= componentName %>-pr-trigger-run-
+        generateName: trggrt-pr-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: <%= componentName %>-pr-test-cases
+          name: trggrt-pr-test-cases
         podTemplate:
           securityContext:
             fsGroup: 65532
@@ -136,6 +135,9 @@ spec:
           - name: github-secret
             secret:
               secretName: github-secret
+          - name: docker-credentials
+            secret:
+              secretName: docker-credentials
 
         params:
           - name: repo-url

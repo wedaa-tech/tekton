@@ -1,6 +1,24 @@
 # /bin/bash
 
-#!/bin/bash
+echo "Enter your GitHub User Name:"
+read  GITHUB_USER_NAME
+
+echo "Enter your GitHub Personal Access Token (PAT):"
+read  TOKEN  
+
+echo "Enter your Image URI:"
+read  IMAGE_URI
+
+echo "Enter Your Encoded Docker Config File:"
+read DOCKER_CONFIG
+
+echo "Enter Your Volume ID:"
+read  VOLUME_ID
+
+
+
+
+
 
 # Variables
 TOKEN="your_github_pat"   # Replace with your actual GitHub PAT
@@ -9,11 +27,11 @@ ORG="your_org_name"   # Optional: specify if you're creating under an organizati
 # Array of repositories to create with name and description
 # Add each repository name and description as elements
 REPOS=(
-  "<%= componentName %>:go"
-  "<%= componentName %>:spring"
-  "<%= componentName %>:python"
-  "<%= componentName %>:react"
-  "<%= componentName %>:angular"
+  "trggrt:go"
+  "trggrt:spring"
+  "trggrt:python"
+  "trggrt:react"
+  "trggrt:angular"
 )
 
 # GitHub API endpoint
@@ -77,7 +95,7 @@ echo "Installing requrired tasks from tekton hub"
 echo ""
 
 echo ""
-namespace="<%= namespaceName %>"
+namespace="ferferfe"
 tkn hub install task git-clone -n ${namespace}
 
 tkn hub install task kaniko  -n ${namespace}
