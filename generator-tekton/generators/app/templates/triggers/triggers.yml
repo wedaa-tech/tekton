@@ -16,7 +16,7 @@ spec:
     - name: git-branch
       value: $(body.ref)    
     - name: image-reference
-      value: <%= imageUri %>   
+      value: $IMAGE_URI   
     - name: clone-dir
       value: $(body.repository.full_name)   
 

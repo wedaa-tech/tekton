@@ -24,7 +24,7 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == '<%= githuborg %>/*'"
+              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == '$GITHUB_USER_NAME/*'"
       bindings:
         - ref: <%= componentName %>-push-trigger-binding
       template:
@@ -45,7 +45,7 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == '<%= githuborg %>/*' && body.action in ['opened', 'synchronize', 'reopened']"
+              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == '$GITHUB_USER_NAME/*' && body.action in ['opened', 'synchronize', 'reopened']"
       bindings:
         - ref: <%= componentName %>-pr-trigger-binding
       template:

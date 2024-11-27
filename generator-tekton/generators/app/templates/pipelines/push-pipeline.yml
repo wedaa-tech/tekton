@@ -108,9 +108,9 @@ spec:
         name: cdk-deploy
       params:
         - name: AWS_ACCESS_KEY_ID
-          value: "$"
+          value: "$AWS_ACCESS_KEY_ID"
         - name: AWS_SECRET_ACCESS_KEY
-          value: "$"
-        - name: AWS_SESSION_TOKEN
-          value: "$"
+          value: "$AWS_SECRET_ACCESS_KEY"
+        - name: AWS_REGION
+          value: "$AWS_REGION"
        
