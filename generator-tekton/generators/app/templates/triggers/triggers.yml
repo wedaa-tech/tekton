@@ -2,7 +2,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
   name: <%= componentName %>-push-trigger-binding
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   params:
     - name: repo-url
@@ -18,14 +18,16 @@ spec:
     - name: image-reference
       value: $IMAGE_URI   
     - name: clone-dir
-      value: $(body.repository.full_name)   
+      value: $(body.repository.full_name)
+    - name: maven-image
+      value: lokeshkarakala/custom-maven-image   
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: <%= componentName %>-push-trigger-template
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   params:
     - name: repo-url
@@ -36,6 +38,7 @@ spec:
     - name: author
     - name: image-reference
     - name: clone-dir
+    - name: maven-image
     
 
   resourcetemplates:
@@ -73,6 +76,8 @@ spec:
             value: $(tt.params.git-branch)
           - name: author
             value: $(tt.params.author)
+          - name: maven-image
+            value: $(tt.params.maven-image)
     
 
 ---
@@ -80,7 +85,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
   name: <%= componentName %>-pr-trigger-binding
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   params:
     - name: revision
@@ -104,7 +109,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: <%= componentName %>-pr-trigger-template
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   params:
     - name: revision

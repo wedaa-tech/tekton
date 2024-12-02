@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: <%= componentName %>-pipeline
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   description: |
     This pipeline clones a git repo, builds a Docker image with Kaniko and
@@ -23,6 +23,8 @@ spec:
     - name: clone-dir
       type: string
     - name: image
+      type: string
+    - name: maven-image
       type: string
     
 
@@ -78,7 +80,8 @@ spec:
       params:
         - name: clone-dir
           value: "$(params.clone-dir)"
-
+    
+    <%_ if (component == "go" || component == "python" || component == "angular" || component == "react") { _%>
     - name: build-push
       runAfter: ["get-commit-sha"]
       taskRef:
@@ -97,20 +100,51 @@ spec:
           value: "$(params.clone-dir)"
         - name: commit_sha
           value: "$(tasks.get-commit-sha.results.commit-sha)"
-
-    - name: cdk-deploy
-      runAfter: ["build-push"]
+    <%_ } _%>
+    
+    <%_ if (component == "spring") { _%>
+    - name: build-push
+      runAfter: ["get-commit-sha"]
+      taskRef:
+        name: jib-maven
       workspaces:
         - name: source
           workspace: shared-data
-       
-      taskRef:
-        name: cdk-deploy
       params:
-        - name: AWS_ACCESS_KEY_ID
+        - name: image
+          value: $(params.image)
+        - name: maven-image
+          value: $(params.maven-image)
+    <%_ } _%>
+
+    - name: <%= componentName %>-deploy
+      runAfter: ["build-push"]
+      workspaces:
+        - name: source
+          workspace: shared-data 
+      taskRef:
+        name: <%= componentName %>-deploy
+      params:
+      <%_ if (cloudProvider == "aws") { _%>
+        - name: aws_access_key_id
           value: "$AWS_ACCESS_KEY_ID"
-        - name: AWS_SECRET_ACCESS_KEY
+        - name: aws_secret_access_key
           value: "$AWS_SECRET_ACCESS_KEY"
-        - name: AWS_REGION
+        - name: region
           value: "$AWS_REGION"
+        - name: eks-cluster-name
+          value: <%= clusterName %>
+    <%_ } _%>
+    <%_ if (cloudProvider == "azure") { _%>
+        - name: azure-client-id
+          value: $AZURE_CLIENT_ID
+        - name: azure-client-secret
+          value: $AZURE_CLIENT_SECRET
+        - name: azure-tenant-id
+          value: $AZURE_TENANT_ID
+        - name: azure-subscription-id
+          value: $AZURE_SUBSCRIPTION_ID
+        - name: aks-cluster-name
+          value: <%= clusterName %>
+    <%_ } _%>
        

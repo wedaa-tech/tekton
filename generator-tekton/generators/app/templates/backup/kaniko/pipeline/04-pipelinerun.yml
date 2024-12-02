@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   generateName: <%= pipelineName %>-run-
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   serviceAccountName: <%= pipelineName %>-service-account
   pipelineRef:

@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: <%= pipelineName %>
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   description: | 
     This pipeline clones a git repo and builds a Spring Boot
@@ -48,6 +48,7 @@ spec:
       value: $(params.revision)
     - name: submodules
       value: $(params.submodules)
+
   - name: jib-maven
     taskRef:
       name: jib-maven

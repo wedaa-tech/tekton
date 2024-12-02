@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: tekton-pvc
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   accessModes:
     - ReadWriteOnce

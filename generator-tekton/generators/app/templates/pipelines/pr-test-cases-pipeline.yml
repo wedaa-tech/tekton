@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: <%= componentName %>-pr-test-cases
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   params:
     - name: repo-url

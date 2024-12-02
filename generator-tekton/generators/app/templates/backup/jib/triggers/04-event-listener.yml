@@ -2,7 +2,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: <%= pipelineName %>-eventlistener
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   resources:
     kubernetesResource:

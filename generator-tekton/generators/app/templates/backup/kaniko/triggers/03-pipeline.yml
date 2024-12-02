@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: <%= pipelineName %>
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   description: | 
     This pipeline clones a git repo, builds a Docker image with Kaniko and

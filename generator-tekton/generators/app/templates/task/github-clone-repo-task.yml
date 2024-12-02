@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: clone-repo
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   description: |
     This pipeline clones a git repo

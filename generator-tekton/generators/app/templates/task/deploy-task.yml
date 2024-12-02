@@ -1,33 +1,73 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: cdk-deploy
-  namespace: <%= namespaceName %>
+  name: <%= componentName %>-deploy
+  namespace: <%= projectName %>-namespace
 spec:
   params:
-    - name: AWS_ACCESS_KEY_ID
+  <%_ if (cloudProvider == "aws") { _%>
+    - name: aws_access_key_id
       type: string
-    - name: AWS_SECRET_ACCESS_KEY
+    - name: aws_secret_access_key
       type: string
-    - name: AWS_SESSION_TOKEN
+    - name: region
+      type: string
+    - name: eks-cluster-name
+      type: string
+  <%_ } _%>
+  <%_ if (cloudProvider == "azure") { _%>
+    - name: azure-client-id
+      type: string
+    - name: azure-client-secret
+      type: string
+    - name: azure-tenant-id
+      type: string
+    - name: azure-subscription-id
+      type: string
+    - name: aks-cluster-name
+      type: string
+  <%_ } _%>
   workspaces:
     - name: source
+  <%_ if (cloudProvider == "aws") { _%>
   steps:
-    - name: deploy-cdk
-      image: node:20.11
+    - name: setup-aws-credentials
+      image: amazonlinux:2
       script: |
-        <%_ if (cloudProvider == "aws") { _%>
-        export IMAGE_TAG=$(params.commit_sha)
-        export AWS_ACCESS_KEY_ID=$(params.AWS_ACCESS_KEY_ID)
-        export AWS_SECRET_ACCESS_KEY=$(params.AWS_SECRET_ACCESS_KEY)
-        export AWS_SESSION_TOKEN=$(params.AWS_SESSION_TOKEN)
-        export AWS_REGION='us-east-2'
+        #!/bin/bash
+        echo "Setting up AWS credentials..."
+        echo "[default]" > ~/.aws/credentials
+        echo "aws_access_key_id = $(params.aws-access-key-id)" >> ~/.aws/credentials
+        echo "aws_secret_access_key = $(params.aws-secret-access-key)" >> ~/.aws/credentials
+        echo "region = $(params.aws-region)" >> ~/.aws/config
 
-        aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+    - name: deploy-to-eks
+      image: bitnami/kubectl:latest
+      script: |
+        #!/bin/bash
+        echo "Deploying to EKS..."
+        cd /workspace/source/$(params.clone-dir)
+        aws eks --region $(params.aws-region) update-kubeconfig --name $(params.eks-cluster-name)
+        kubectl apply -f "yml files"
+    <%_ } _%>
 
-        kubectl apply -f "files directory path"
-        <%_ } _%>
-        
-        <%_ if (cloudProvider == "azure") { _%>
-        sdvfdbvd
-        <%_ } _%>
+    <%_ if (cloudProvider == "azure") { _%>
+    - name: setup-azure-credentials
+      image: mcr.microsoft.com/azure-cli
+      script: |
+        #!/bin/bash
+        echo "Setting up Azure credentials..."
+        az account set --subscription $(params.azure-subscription-id)
+        az ad sp create-for-rbac --name http://myApp --query password -o tsv > azure-credentials.txt
+        AZURE_CLIENT_ID=$(params.azure-client-id) AZURE_CLIENT_SECRET=$(params.azure-client-secret) AZURE_TENANT_ID=$(params.azure-tenant-id)
+
+    - name: deploy-to-aks
+      image: bitnami/kubectl:latest
+      script: |
+        #!/bin/bash
+        echo "Deploying to AKS..."
+        cd /workspace/source/$(params.clone-dir)
+        az aks get-credentials --resource-group $(params.azure-resource-group) --name $(params.aks-cluster-name)
+        kubectl apply -f "yaml files"
+    <%_ } _%>
+  

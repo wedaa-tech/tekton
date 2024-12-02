@@ -2,7 +2,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
   name: <%= pipelineName %>-trigger-binding
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   params:
   - name: revision
@@ -26,7 +26,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: <%= pipelineName %>-trigger-template
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   params:
   - name: revision

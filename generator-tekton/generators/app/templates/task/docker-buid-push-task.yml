@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: build-and-push-kaniko
-  namespace: <%= namespaceName %>
+  namespace: <%= projectName %>-namespace
 spec:
   params:
     - name: clone-dir
@@ -28,3 +28,4 @@ spec:
         - "--cache-run-layers"
         - "--cache-copy-layers"
   
+
