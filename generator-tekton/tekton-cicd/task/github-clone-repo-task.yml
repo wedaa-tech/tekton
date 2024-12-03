@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: clone-repo
-  namespace: eferg-namespace
+  namespace: test-namespace
 spec:
   description: |
     This pipeline clones a git repo

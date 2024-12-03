@@ -1,8 +1,8 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: jkgkj-deploy
-  namespace: eferg-namespace
+  name: spring,go,python-deploy
+  namespace: test-namespace
 spec:
   params:
     - name: aws_access_key_id

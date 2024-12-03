@@ -1,8 +1,8 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: jkgkj-push-trigger-binding
-  namespace: eferg-namespace
+  name: spring-push-trigger-binding
+  namespace: test-namespace
 spec:
   params:
     - name: repo-url
@@ -26,8 +26,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: jkgkj-push-trigger-template
-  namespace: eferg-namespace
+  name: spring-push-trigger-template
+  namespace: test-namespace
 spec:
   params:
     - name: repo-url
@@ -45,11 +45,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: jkgkj-push-trigger-run-
+        generateName: spring-push-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: jkgkj-pipeline
+          name: spring-pipeline
         podTemplate:
           securityContext:
             fsGroup: 65532
@@ -84,8 +84,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: jkgkj-pr-trigger-binding
-  namespace: eferg-namespace
+  name: spring-pr-trigger-binding
+  namespace: test-namespace
 spec:
   params:
     - name: revision
@@ -108,8 +108,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: jkgkj-pr-trigger-template
-  namespace: eferg-namespace
+  name: spring-pr-trigger-template
+  namespace: test-namespace
 spec:
   params:
     - name: revision
@@ -125,11 +125,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: jkgkj-pr-trigger-run-
+        generateName: spring-pr-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: jkgkj-pr-test-cases
+          name: spring-pr-test-cases
         podTemplate:
           securityContext:
             fsGroup: 65532

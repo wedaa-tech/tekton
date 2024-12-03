@@ -1,8 +1,8 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: eferg-eventlistener
-  namespace: eferg-namespace
+  name: test-eventlistener
+  namespace: test-namespace
 spec:
   resources:
     kubernetesResource:
@@ -26,9 +26,9 @@ spec:
             - name: "filter"
               value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == '$GITHUB_USER_NAME/*'"
       bindings:
-        - ref: jkgkj-push-trigger-binding
+        - ref: spring,go,python-push-trigger-binding
       template:
-        ref: jkgkj-push-trigger-template
+        ref: spring,go,python-push-trigger-template
 
     - name: pr-trigger
       interceptors:
@@ -47,8 +47,8 @@ spec:
             - name: "filter"
               value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == '$GITHUB_USER_NAME/*' && body.action in ['opened', 'synchronize', 'reopened']"
       bindings:
-        - ref: jkgkj-pr-trigger-binding
+        - ref: spring,go,python-pr-trigger-binding
       template:
-        ref: jkgkj-pr-trigger-template
+        ref: spring,go,python-pr-trigger-template
 
    

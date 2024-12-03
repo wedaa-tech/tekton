@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: get-commit-sha
-  namespace: eferg-namespace
+  namespace: test-namespace
 spec:
   params:
     - name: clone-dir

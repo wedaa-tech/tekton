@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: cash-deposits-test-cases
-  namespace: <%= projectName %>-namespace
+  namespace: test-namespace
 spec:
   workspaces:
     - name: source
@@ -16,26 +16,6 @@ spec:
     - name: git-branch
       type: string
   steps:
-    <%_ if (componentName == "react") { _%>
-    - name: test-cases
-      image: node:20.0.0
-      script: |
-        cd /workspace/source/$(params.clone-dir)
-        ls 
-        rm -rf test-repost.txt
-        npm i --force
-        npm test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
-    <%_ } _%>
-    <%_ if (componentName == "spring") { _%>
-    - name: test-cases
-      image: maven:latest
-      script: |
-        cd /workspace/source/$(params.clone-dir)
-        ls 
-        rm -rf test-repost.txt
-        mvn test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
-    <%_ } _%>
-    <%_ if (componentName == "go") { _%>
     - name: test-cases
       image: golang:latest
       script: |
@@ -43,26 +23,6 @@ spec:
         ls 
         rm -rf test-repost.txt
         go test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
-    <%_ } _%>
-    <%_ if (componentName == "python") { _%>
-    - name: test-cases
-      image: python:latest
-      script: |
-        cd /workspace/source/$(params.clone-dir)
-        ls 
-        rm -rf test-repost.txt
-        pytest -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
-    <%_ } _%>
-    <%_ if (componentName == "angular") { _%>
-    - name: test-cases
-      image: node:20.0.0
-      script: |
-        cd /workspace/source/$(params.clone-dir)
-        ls 
-        rm -rf test-repost.txt
-        npm i --force
-        npm test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
-    <%_ } _%>  
  
     - name: extract-test-status-and-coverage
       image: bash:latest

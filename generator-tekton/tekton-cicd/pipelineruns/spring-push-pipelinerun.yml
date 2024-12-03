@@ -1,12 +1,12 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: jkgkj-push-trigger-run-
-  namespace: eferg-namespace
+  name: spring-push-trigger-run-
+  namespace: test-namespace
 spec:
   serviceAccountName: tekton-service-account
   pipelineRef:
-    name: jkgkj-pipeline
+    name: spring-pipeline
   podTemplate:
     securityContext:
       fsGroup: 65532

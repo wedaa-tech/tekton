@@ -113,7 +113,7 @@ install_tekton() {
   echo "Exposing Tekton Dashboard via NodePort..."
   kubectl -n tekton-pipelines patch svc tekton-dashboard -p '{"spec": {"type": "NodePort"}}'
   check_command "Tekton Dashboard exposure"
-<%_ if (componentType == "spring") { _%>
+<%_ if (componentName == "spring") { _%>
   echo "Install Jib Task"
   kubectl apply -f https://api.hub.tekton.dev/v1/resource/tekton/task/jib-maven/0.5/raw
 <%_ } _%>

@@ -2,7 +2,7 @@
   "componentName": ["jkgkj", "jhgygty" ],
   "projectName": "eferg",
   "cloudProvider": "aws",
-  "componentType": ["go", "python"] 
+  "componentName": ["go", "python"] 
 }
 
   

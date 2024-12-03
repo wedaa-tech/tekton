@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: send-status-to-github
-  namespace: eferg-namespace
+  namespace: test-namespace
 spec:
   params:
     - name: repo-url
@@ -27,7 +27,7 @@ spec:
         GITHUB_TOKEN=$(cat /github/creds/secretToken)
 
         REPO_URL=$(echo $(params.repo-url) | sed 's|github.com/||; s|.git$||')
-        # TARGET_URL="http://localhost:9097//#/namespaces/eferg-namespace/pipelineruns/$(context.pipelineRun.name)?pipelineTask=test-cases"
+        # TARGET_URL="http://localhost:9097//#/namespaces/test-namespace/pipelineruns/$(context.pipelineRun.name)?pipelineTask=test-cases"
         commit_sha=$(params.commit-sha)
         TEST_STATUS=$(params.test-status)
         COVERAGE=$(params.coverage)

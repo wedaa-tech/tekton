@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: cash-deposits-test-cases
-  namespace: eferg-namespace
+  namespace: test-namespace
 spec:
   workspaces:
     - name: source
@@ -17,12 +17,12 @@ spec:
       type: string
   steps:
     - name: test-cases
-      image: golang:latest
+      image: python:latest
       script: |
         cd /workspace/source/$(params.clone-dir)
         ls 
         rm -rf test-repost.txt
-        go test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
+        pytest -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
  
     - name: extract-test-status-and-coverage
       image: bash:latest

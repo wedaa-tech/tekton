@@ -1,7 +1,6 @@
 {
-  "componentName": ["jkgkj"],
-  "projectName": "eferg",
+  "componentName": ["spring", "go", "python"],
+  "projectName": "test",
   "cloudProvider": "aws",
-  "componentType": ["go"],
   "clusterName": "test-cluster"
 }
