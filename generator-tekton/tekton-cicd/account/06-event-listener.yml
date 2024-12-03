@@ -2,7 +2,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: eferg-eventlistener
-  namespace: ferferfe
+  namespace: eferg-namespace
 spec:
   resources:
     kubernetesResource:
@@ -24,11 +24,11 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'dsvafdddddf/*'"
+              value: "header.match('X-GitHub-Event', 'push') && body.repository.full_name == '$GITHUB_USER_NAME/*'"
       bindings:
-        - ref: trggrt-push-trigger-binding
+        - ref: jkgkj-push-trigger-binding
       template:
-        ref: trggrt-push-trigger-template
+        ref: jkgkj-push-trigger-template
 
     - name: pr-trigger
       interceptors:
@@ -45,10 +45,10 @@ spec:
             name: "cel"
           params:
             - name: "filter"
-              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == 'dsvafdddddf/*' && body.action in ['opened', 'synchronize', 'reopened']"
+              value: "header.match('X-GitHub-Event', 'pull_request') && body.repository.full_name == '$GITHUB_USER_NAME/*' && body.action in ['opened', 'synchronize', 'reopened']"
       bindings:
-        - ref: trggrt-pr-trigger-binding
+        - ref: jkgkj-pr-trigger-binding
       template:
-        ref: trggrt-pr-trigger-template
+        ref: jkgkj-pr-trigger-template
 
    

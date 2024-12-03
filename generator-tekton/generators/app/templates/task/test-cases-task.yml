@@ -16,7 +16,7 @@ spec:
     - name: git-branch
       type: string
   steps:
-    <%_ if (component == "react") { _%>
+    <%_ if (componentType == "react") { _%>
     - name: test-cases
       image: node:20.0.0
       script: |
@@ -26,7 +26,7 @@ spec:
         npm i --force
         npm test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
     <%_ } _%>
-    <%_ if (component == "spring") { _%>
+    <%_ if (componentType == "spring") { _%>
     - name: test-cases
       image: maven:latest
       script: |
@@ -35,7 +35,7 @@ spec:
         rm -rf test-repost.txt
         mvn test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
     <%_ } _%>
-    <%_ if (component == "go") { _%>
+    <%_ if (componentType == "go") { _%>
     - name: test-cases
       image: golang:latest
       script: |
@@ -44,7 +44,7 @@ spec:
         rm -rf test-repost.txt
         go test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
     <%_ } _%>
-    <%_ if (component == "python") { _%>
+    <%_ if (componentType == "python") { _%>
     - name: test-cases
       image: python:latest
       script: |
@@ -53,7 +53,7 @@ spec:
         rm -rf test-repost.txt
         pytest -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
     <%_ } _%>
-    <%_ if (component == "angular") { _%>
+    <%_ if (componentType == "angular") { _%>
     - name: test-cases
       image: node:20.0.0
       script: |

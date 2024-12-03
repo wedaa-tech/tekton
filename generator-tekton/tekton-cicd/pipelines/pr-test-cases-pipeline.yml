@@ -1,8 +1,8 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: trggrt-pr-test-cases
-  namespace: ferferfe
+  name: jkgkj-pr-test-cases
+  namespace: eferg-namespace
 spec:
   params:
     - name: repo-url

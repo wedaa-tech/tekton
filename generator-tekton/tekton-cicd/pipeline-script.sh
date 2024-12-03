@@ -1,131 +1,149 @@
-# /bin/bash
+#!/bin/bash
 
-echo "Enter your GitHub User Name:"
-read  GITHUB_USER_NAME
+echo "Before continuing, please go and fill the values in config.env file and come back here."
+read -p "Did you fill the values in config.env? (yes/no): " response
 
-echo "Enter your GitHub Personal Access Token (PAT):"
-read  TOKEN  
+# Check the user's response
+if [[ "$response" == "yes" ]]; then
+    echo "Great! Proceeding with the script..."
+   
 
-echo "Enter your Image URI:"
-read  IMAGE_URI
+# Navigate to the script's directory
+cd "$(dirname "$0")"
 
-echo "Enter Your Encoded Docker Config File:"
-read DOCKER_CONFIG
+# Load configuration from env or a config file
+source ./config.env || { echo "Error: Missing config.env file."; exit 1; }
 
-echo "Enter Your Volume ID:"
-read  VOLUME_ID
+# Check command execution status
+check_command() {
+  if [ $? -ne 0 ]; then
+    echo "Error: $1 failed. Exiting."
+    exit 1
+  fi
+}
 
+# Set credentials
+setup_aws_credentials() {
+  export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY"
+  export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY"
+  export AWS_DEFAULT_REGION="$AWS_REGION"
+}
+# Create a GitHub repository
+create_github_repo() {
+  local repo_name="$1"
+  local response
 
+  response=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Authorization: token $GITHUB_PAT" \
+    -d "{\"name\": \"$repo_name\", \"private\": true}" "https://api.github.com/user/repos")
 
+  if [ "$response" -ne 201 ]; then
+    echo "Error: Failed to create GitHub repository '$repo_name'. HTTP Code: $response"
+    return 1
+  fi
+  echo "GitHub repository '$repo_name' created successfully."
+}
 
+# Initialize Git and push code to GitHub
+initialize_git() {
+  local dir="$1"
+  local repo_name="$2"
 
+  cd "$dir" || return 1
+  git init
+  git add .
+  git commit -m "Initial commit"
+  git branch -M main
+  git remote add origin "https://$GITHUB_USERNAME:$GITHUB_PAT@github.com/$GITHUB_USERNAME/$repo_name.git"
+  git push -u origin main
+  cd - >/dev/null || return 1
 
-# Variables
-TOKEN="your_github_pat"   # Replace with your actual GitHub PAT
-ORG="your_org_name"   # Optional: specify if you're creating under an organization; leave blank for personal account
+  echo "Code from $dir pushed to GitHub repository '$repo_name'."
+}
 
-# Array of repositories to create with name and description
-# Add each repository name and description as elements
-REPOS=(
-  "trggrt:go"
-  "trggrt:spring"
-  "trggrt:python"
-  "trggrt:react"
-  "trggrt:angular"
-)
+# Process directories
+process_directories() {
+  for dir in ../*; do
+    if [ -d "$dir" ]; then
+      local repo_name
+      repo_name=$(basename "$dir")
 
-# GitHub API endpoint
-API_URL="https://api.github.com"
+      if [[ "$repo_name" == "blueprints" || "$repo_name" == "HOW_TO_RUN.md" || "$repo_name" == *.zip ]]; then
+        echo "Skipping $repo_name..."
+        continue
+      fi
 
-# Loop through each repository in the array
-for repo_info in "${REPOS[@]}"; do
-  # Split each entry into repo name and description
-  IFS=":" read -r REPO_NAME DESCRIPTION <<< "$repo_info"
-  
-  # JSON payload
-  PAYLOAD=$(jq -n \
-    --arg name "$REPO_NAME" \
-    --arg description "$DESCRIPTION" \
-    --arg private "true" \
-    '{name: $name, description: $description, private: ($private == "true")}')
+      echo "Processing $repo_name..."
+      create_github_repo "$repo_name" || continue
+      initialize_git "$dir" "$repo_name"
+    fi
+  done
+}
 
-  # Curl command to create the repository
-  curl -X POST \
-    -H "Authorization: token $TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    -d "$PAYLOAD" \
-    "$API_URL/orgs/$ORG/repos"  # For org account
-    # "$API_URL/user/repos"       # Uncomment for personal account
-  
-  echo "Repository '$REPO_NAME' created with description: $DESCRIPTION"
-done
-##############################################################################################################################
+# Install Tekton components
+install_tekton() {
+  echo "Installing Tekton CLI..."
+  curl -LO "https://github.com/tektoncd/cli/releases/download/v0.33.0/tektoncd-cli-0.33.0_Linux-64bit.deb"
+  sudo dpkg -i tektoncd-cli-0.33.0_Linux-64bit.deb
+  check_command "Tekton CLI installation"
 
-echo ""
-echo "Installing tekton cli."
-linktothepackage="tektoncd-cli-0.33.0_Linux-64bit.deb"
-curl -LO https://github.com/tektoncd/cli/releases/download/v0.33.0/${linktothepackage}
-sudo dpkg -i ./${linktothepackage}
-echo ""
+  echo "Installing Tekton Pipelines..."
+  kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+  check_command "Tekton Pipelines installation"
 
-echo ""
-echo "\033[1mPrerequisite:\033[0m"
-echo " 1. Make sure that your cluster is up and running and installed kubectl and k8s dashboard"
-echo " 2. Make sure that you have installed tekton cli."
-echo ""
+  echo "Installing Tekton Triggers..."
+  kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
+  check_command "Tekton Triggers installation"
+  kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
+  check_command "Tekton Interceptors installation"
 
+  echo "Installing Tekton Dashboard..."
+  kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/release-full.yaml
+  check_command "Tekton Dashboard installation"
 
-kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
-kubectl apply --filename \
-https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
-kubectl apply --filename \
-https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
-kubectl apply --filename \
-https://storage.googleapis.com/tekton-releases/dashboard/latest/release-full.yaml
-
-
-echo ""
-kubectl apply -f pipeline-yml-files/00-namespace.yml
-echo ""
-
-sleep 30
-
-echo ""
-echo "Installing requrired tasks from tekton hub"
-echo ""
-
-echo ""
-namespace="ferferfe"
-tkn hub install task git-clone -n ${namespace}
-
-tkn hub install task kaniko  -n ${namespace}
-
-
-tkn hub install task jib-maven -n ${namespace}
-
-
-tkn hub install task sonarqube-scanner -n ${namespace}
-
-echo ""
-
-sleep 30
-
-echo ""
-kubectl apply -f pipeline-yml-files/01-secrets.yml
-kubectl apply -f pipeline-yml-files/02-rbac.yml
-kubectl apply -f pipeline-yml-files/03-pipeline.yml
-
-kubectl create -f pipeline-yml-files/04-pipelinerun.yml
-
-kubectl apply -f pipeline-yml-files/04-event-listener.yml
-kubectl apply -f pipeline-yml-files/05-triggers.yml
-
-echo ""
-
-echo ""
-echo "Access tekton dashboard in web http://localhost:9097"
-echo ""
-
-kubectl port-forward -n tekton-pipelines service/tekton-dashboard 9097:9097
+  echo "Exposing Tekton Dashboard via NodePort..."
+  kubectl -n tekton-pipelines patch svc tekton-dashboard -p '{"spec": {"type": "NodePort"}}'
+  check_command "Tekton Dashboard exposure"
+}
 
 
+# Apply YAML configurations
+apply_yaml_configs() {
+  for file in account/*.yml; do
+    kubectl apply -f "$file"
+    check_command "Applying $file"
+  done
+
+  for file in task/*.yml; do
+    kubectl apply -f "$file"
+    check_command "Applying $file"
+  done
+
+  for file in pipelines/*.yml; do
+    kubectl apply -f "$file"
+    check_command "Applying $file"
+  done
+
+  for file in pipelineruns/*.yml; do
+    kubectl apply -f "$file"
+    check_command "Applying $file"
+  done
+
+  kubectl apply -f triggers/triggers.yml
+  check_command "Applying triggers.yml"
+}
+
+# Main function
+main() {
+  setup_aws_credentials
+  process_directories
+  install_tekton
+  apply_yaml_configs
+  echo "Tekton installation and directory processing complete."
+}
+
+main
+
+else
+    echo "Please fill the values in config.env and run the script again."
+    exit 1
+fi

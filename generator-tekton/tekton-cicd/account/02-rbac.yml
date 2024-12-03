@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: tekton-service-account
-  namespace: ferferfe 
+  namespace: eferg-namespace 
 secrets:
   - name: github-secret
   - name: docker-credentials
@@ -11,8 +11,8 @@ secrets:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: tekton-trggrt-role
-  namespace: ferferfe
+  name: tekton-jkgkj-role
+  namespace: eferg-namespace
 rules:
   - apiGroups: ["triggers.tekton.dev"]
     resources:
@@ -41,22 +41,22 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tekton-trggrt-binding
-  namespace: ferferfe
+  name: tekton-jkgkj-binding
+  namespace: eferg-namespace
 subjects:
   - kind: ServiceAccount
     name: tekton-service-account
-    namespace: ferferfe
+    namespace: eferg-namespace
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: tekton-trggrt-role
+  name: tekton-jkgkj-role
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: tekton-trggrt-clusterrole
-  namespace: ferferfe
+  name: tekton-jkgkj-clusterrole
+  namespace: eferg-namespace
 rules:
   - apiGroups: ["triggers.tekton.dev"]
     resources: ["clustertriggerbindings", "clusterinterceptors", "interceptors"]
@@ -65,22 +65,22 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: tekton-trggrt-clusterbinding
-  namespace: ferferfe
+  name: tekton-jkgkj-clusterbinding
+  namespace: eferg-namespace
 subjects:
   - kind: ServiceAccount
     name: tekton-service-account
-    namespace: ferferfe
+    namespace: eferg-namespace
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: tekton-trggrt-clusterrole
+  name: tekton-jkgkj-clusterrole
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: tekton-trggrt-kubectl-role
-  namespace: ferferfe
+  name: tekton-jkgkj-kubectl-role
+  namespace: eferg-namespace
 rules:
   - apiGroups:
       - "*"
@@ -101,23 +101,23 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tekton-trggrt-kubectl-binding
-  namespace: ferferfe
+  name: tekton-jkgkj-kubectl-binding
+  namespace: eferg-namespace
 subjects:
   - kind: ServiceAccount
     name: tekton-service-account
-    namespace: ferferfe
+    namespace: eferg-namespace
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: tekton-trggrt-kubectl-role
+  name: tekton-jkgkj-kubectl-role
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: ferferfe
-  name: tekton-trggrt-ssh-role
+  namespace: eferg-namespace
+  name: tekton-jkgkj-ssh-role
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
@@ -127,15 +127,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tekton-trggrt-ssh-binding
-  namespace: ferferfe
+  name: tekton-jkgkj-ssh-binding
+  namespace: eferg-namespace
 subjects:
   - kind: ServiceAccount
     name: tekton-service-account
-    namespace: ferferfe
+    namespace: eferg-namespace
 roleRef:
   kind: Role
-  name: tekton-trggrt-ssh-role
+  name: tekton-jkgkj-ssh-role
   apiGroup: rbac.authorization.k8s.io
 
 ---
@@ -143,7 +143,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: tekton-git-access
-  namespace: ferferfe
+  namespace: eferg-namespace
 rules:
   - apiGroups: [""]
     resources: ["pods"]
@@ -153,23 +153,23 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: tekton-trggrt-git-access-binding
-  namespace: ferferfe
+  name: tekton-jkgkj-git-access-binding
+  namespace: eferg-namespace
 subjects:
   - kind: ServiceAccount
     name: tekton-service-account
-    namespace: ferferfe
+    namespace: eferg-namespace
 roleRef:
   kind: ClusterRole
-  name: tekton-trggrt-git-access
+  name: tekton-jkgkj-git-access
   apiGroup: rbac.authorization.k8s.io
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: tekton-trggrt-workspace-access-role
-  namespace: ferferfe
+  name: tekton-jkgkj-workspace-access-role
+  namespace: eferg-namespace
 rules:
   - apiGroups: [""]
     resources: ["pods/exec", "pods/log"]
@@ -185,13 +185,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: tekton-trggrt-workspace-access-binding
-  namespace: ferferfe
+  name: tekton-jkgkj-workspace-access-binding
+  namespace: eferg-namespace
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: tekton-trggrt-workspace-access-role
+  name: tekton-jkgkj-workspace-access-role
 subjects:
   - kind: ServiceAccount
     name: ticgo-pipeline-service-account
-    namespace: ferferfe
+    namespace: eferg-namespace

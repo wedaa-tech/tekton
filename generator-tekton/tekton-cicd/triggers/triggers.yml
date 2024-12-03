@@ -1,8 +1,8 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: trggrt-push-trigger-binding${TOKEN}
-  namespace: ferferfe
+  name: jkgkj-push-trigger-binding
+  namespace: eferg-namespace
 spec:
   params:
     - name: repo-url
@@ -16,16 +16,18 @@ spec:
     - name: git-branch
       value: $(body.ref)    
     - name: image-reference
-      value: grewge   
+      value: $IMAGE_URI   
     - name: clone-dir
-      value: $(body.repository.full_name)   
+      value: $(body.repository.full_name)
+    - name: maven-image
+      value: lokeshkarakala/custom-maven-image   
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: trggrt-push-trigger-template
-  namespace: ferferfe
+  name: jkgkj-push-trigger-template
+  namespace: eferg-namespace
 spec:
   params:
     - name: repo-url
@@ -36,17 +38,18 @@ spec:
     - name: author
     - name: image-reference
     - name: clone-dir
+    - name: maven-image
     
 
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: trggrt-push-trigger-run-
+        generateName: jkgkj-push-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: trggrt-pipeline
+          name: jkgkj-pipeline
         podTemplate:
           securityContext:
             fsGroup: 65532
@@ -73,14 +76,16 @@ spec:
             value: $(tt.params.git-branch)
           - name: author
             value: $(tt.params.author)
+          - name: maven-image
+            value: $(tt.params.maven-image)
     
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: trggrt-pr-trigger-binding
-  namespace: ferferfe
+  name: jkgkj-pr-trigger-binding
+  namespace: eferg-namespace
 spec:
   params:
     - name: revision
@@ -94,7 +99,7 @@ spec:
     - name: submodules
       value: "false"
     - name: image-reference
-      value: grewge
+      value: $IMAGE_URI
     - name: clone-dir
       value: $(body.repository.full_name)
  
@@ -103,8 +108,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: trggrt-pr-trigger-template
-  namespace: ferferfe
+  name: jkgkj-pr-trigger-template
+  namespace: eferg-namespace
 spec:
   params:
     - name: revision
@@ -120,11 +125,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: trggrt-pr-trigger-run-
+        generateName: jkgkj-pr-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: trggrt-pr-test-cases
+          name: jkgkj-pr-test-cases
         podTemplate:
           securityContext:
             fsGroup: 65532

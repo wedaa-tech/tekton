@@ -1,6 +1,7 @@
 {
-  "namespaceName": "ferferfe",
-  "componentName": "trggrt",
+  "componentName": ["jkgkj"],
   "projectName": "eferg",
-  "cloudProvider": "aws"
+  "cloudProvider": "aws",
+  "componentType": ["go"],
+  "clusterName": "test-cluster"
 }

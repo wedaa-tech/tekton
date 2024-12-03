@@ -1,8 +1,8 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: trggrt-pipeline
-  namespace: ferferfe
+  name: jkgkj-pipeline
+  namespace: eferg-namespace
 spec:
   description: |
     This pipeline clones a git repo, builds a Docker image with Kaniko and
@@ -23,6 +23,8 @@ spec:
     - name: clone-dir
       type: string
     - name: image
+      type: string
+    - name: maven-image
       type: string
     
 
@@ -78,7 +80,7 @@ spec:
       params:
         - name: clone-dir
           value: "$(params.clone-dir)"
-
+    
     - name: build-push
       runAfter: ["get-commit-sha"]
       taskRef:
@@ -97,20 +99,22 @@ spec:
           value: "$(params.clone-dir)"
         - name: commit_sha
           value: "$(tasks.get-commit-sha.results.commit-sha)"
+    
 
-    - name: cdk-deploy
+    - name: jkgkj-deploy
       runAfter: ["build-push"]
       workspaces:
         - name: source
-          workspace: shared-data
-       
+          workspace: shared-data 
       taskRef:
-        name: cdk-deploy
+        name: jkgkj-deploy
       params:
-        - name: AWS_ACCESS_KEY_ID
-          value: "$"
-        - name: AWS_SECRET_ACCESS_KEY
-          value: "$"
-        - name: AWS_SESSION_TOKEN
-          value: "$"
+        - name: aws_access_key_id
+          value: "$AWS_ACCESS_KEY_ID"
+        - name: aws_secret_access_key
+          value: "$AWS_SECRET_ACCESS_KEY"
+        - name: region
+          value: "$AWS_REGION"
+        - name: eks-cluster-name
+          value: test-cluster
        

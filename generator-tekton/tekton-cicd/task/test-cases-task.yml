@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: cash-deposits-test-cases
-  namespace: ferferfe
+  namespace: eferg-namespace
 spec:
   workspaces:
     - name: source
@@ -17,15 +17,12 @@ spec:
       type: string
   steps:
     - name: test-cases
-      image: node:20.0.0
+      image: golang:latest
       script: |
         cd /workspace/source/$(params.clone-dir)
         ls 
         rm -rf test-repost.txt
-        npm i --force
-        #echo `npm test -- --watchAll=false` > /workspace/source/$(params.clone-dir)/test-report.txt 2>&1
-        npm test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
-       
+        go test -- --watchAll=false 2>&1 | tee /workspace/source/$(params.clone-dir)/test-report.txt
  
     - name: extract-test-status-and-coverage
       image: bash:latest

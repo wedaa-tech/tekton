@@ -99,7 +99,7 @@ spec:
     - name: submodules
       value: "false"
     - name: image-reference
-      value: <%= imageUri %>
+      value: $IMAGE_URI
     - name: clone-dir
       value: $(body.repository.full_name)
  

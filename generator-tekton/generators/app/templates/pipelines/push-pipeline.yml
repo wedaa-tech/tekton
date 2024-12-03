@@ -81,7 +81,7 @@ spec:
         - name: clone-dir
           value: "$(params.clone-dir)"
     
-    <%_ if (component == "go" || component == "python" || component == "angular" || component == "react") { _%>
+    <%_ if (componentType == "go" || componentType == "python" || componentType == "angular" || componentType == "react") { _%>
     - name: build-push
       runAfter: ["get-commit-sha"]
       taskRef:
@@ -102,7 +102,7 @@ spec:
           value: "$(tasks.get-commit-sha.results.commit-sha)"
     <%_ } _%>
     
-    <%_ if (component == "spring") { _%>
+    <%_ if (componentType == "spring") { _%>
     - name: build-push
       runAfter: ["get-commit-sha"]
       taskRef:

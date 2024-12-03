@@ -52,38 +52,7 @@ create_github_repo() {
   fi
   echo "GitHub repository '$repo_name' created successfully."
 }
-<%_ if (cloudProvider == "aws") { _%>
-# Create an AWS ECR repository
-create_ecr_repo() {
-  local repo_name="$1"
-  local ecr_response
 
-  ecr_response=$(aws ecr create-repository --repository-name "$repo_name" --query 'repository.repositoryUri' --output text 2>&1)
-
-  if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to create ECR repository for $repo_name. AWS CLI Error: $ecr_response"
-    return 1
-  fi
-
-  echo "AWS ECR repository '$repo_name' created successfully."
-}
-<%_ } _%>
-<%_ if (cloudProvider == "azure") { _%>
-# Create an Azure ACR repository
-create_acr_repo() {
-  local repo_name="$1"
-  local acr_response
-
-  acr_response=$(az acr create --name "$repo_name" --resource-group "$AZURE_RESOURCE_GROUP" --sku Basic --query 'loginServer' --output tsv 2>&1)
-
-  if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to create ACR repository for $repo_name. Azure CLI Error: $acr_response"
-    return 1
-  fi
-
-  echo "Azure ACR repository '$repo_name' created successfully."
-}
-<%_ } _%>
 # Initialize Git and push code to GitHub
 initialize_git() {
   local dir="$1"
@@ -115,12 +84,6 @@ process_directories() {
 
       echo "Processing $repo_name..."
       create_github_repo "$repo_name" || continue
-      <%_ if (cloudProvider == "aws") { _%>
-      create_ecr_repo "$repo_name" || continue
-      <%_ } _%>
-      <%_ if (cloudProvider == "azure") { _%>
-      create_acr_repo "$repo_name" || continue
-      <%_ } _%>
       initialize_git "$dir" "$repo_name"
     fi
   done
@@ -150,7 +113,7 @@ install_tekton() {
   echo "Exposing Tekton Dashboard via NodePort..."
   kubectl -n tekton-pipelines patch svc tekton-dashboard -p '{"spec": {"type": "NodePort"}}'
   check_command "Tekton Dashboard exposure"
-<%_ if (component == "spring") { _%>
+<%_ if (componentType == "spring") { _%>
   echo "Install Jib Task"
   kubectl apply -f https://api.hub.tekton.dev/v1/resource/tekton/task/jib-maven/0.5/raw
 <%_ } _%>
