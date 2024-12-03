@@ -23,21 +23,6 @@ check_command() {
 }
 
 # Set credentials
-<%_ if (cloudProvider == "aws") { _%>
-setup_aws_credentials() {
-  export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY"
-  export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY"
-  export AWS_DEFAULT_REGION="$AWS_REGION"
-}
-<%_ } _%>
-<%_ if (cloudProvider == "azure") { _%>
-setup_azure_credentials() {
-  export AZURE_CLIENT_ID="$AZURE_CLIENT_ID"
-  export AZURE_CLIENT_SECRET="$AZURE_CLIENT_SECRET"
-  export AZURE_TENANT_ID="$AZURE_TENANT_ID"
-  export AZURE_SUBSCRIPTION_ID="$AZURE_SUBSCRIPTION_ID"
-}
-<%_ } _%>
 # Create a GitHub repository
 create_github_repo() {
   local repo_name="$1"
@@ -109,25 +94,6 @@ install_tekton() {
   echo "Installing Tekton Dashboard..."
   kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/release-full.yaml
   check_command "Tekton Dashboard installation"
-<%_ if (cloudProvider == "aws" || cloudProvider == "azure") { _%>
-  # Expose Tekton Dashboard via LoadBalancer
-  echo "Exposing Tekton Dashboard via LoadBalancer..."
-  kubectl -n tekton-pipelines patch svc tekton-dashboard -p '{"spec": {"type": "LoadBalancer"}}'
-  check_command "Expose Tekton Dashboard via LoadBalancer"
-  echo ""
-
-  # Get the LoadBalancer details
-  echo "Fetching LoadBalancer information..."
-  lb_hostname=$(kubectl get svc tekton-dashboard -n tekton-pipelines -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-
-  # Wait for the LoadBalancer to be provisioned
-  while [ -z "$lb_hostname" ]; do
-    echo "Waiting for LoadBalancer provisioning..."
-    sleep 30
-    lb_hostname=$(kubectl get svc tekton-dashboard -n tekton-pipelines -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-  done
-<%_ } _%>
-<%_ if (cloudProvider == "minikube") { _%>
   echo "Exposing Tekton Dashboard via NodePort..."
   kubectl -n tekton-pipelines patch svc tekton-dashboard -p '{"spec": {"type": "NodePort"}}'
   check_command "Tekton Dashboard exposure"
@@ -138,11 +104,6 @@ install_tekton() {
 
   echo "Tekton Dashboard is available at http://${node_ip}:${node_port}"
   echo ""
-<%_ } _%>
-<%_ if (componentName == "spring") { _%>
-  echo "Install Jib Task"
-  kubectl apply -f https://api.hub.tekton.dev/v1/resource/tekton/task/jib-maven/0.5/raw
-<%_ } _%>
 }
 
 
@@ -174,12 +135,6 @@ apply_yaml_configs() {
 
 # Main function
 main() {
-<%_ if (cloudProvider == "aws") { _%>
-  setup_aws_credentials
-<%_ } _%>
-<%_ if (cloudProvider == "azure") { _%>
-  setup_azure_credentials
-<%_ } _%>
   process_directories
   install_tekton
   apply_yaml_configs

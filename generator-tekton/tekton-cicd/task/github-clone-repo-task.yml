@@ -1,0 +1,56 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: clone-repo
+  namespace: test-namespace
+spec:
+  description: |
+    This pipeline clones a git repo
+  params:
+    - name: repo-url
+      type: string
+    - name: revision
+      type: string
+    - name: submodules
+      type: string
+    - name: git-branch
+      type: string
+    - name: author
+      type: string
+    - name: clone-dir
+      type: string
+
+  workspaces:
+    - name: source
+    - name: github-secret
+  steps:
+    - name: clone
+      image: alpine/git
+      script: |
+        #!/bin/sh
+        GITHUB_TOKEN=$(cat /github/creds/secretToken)
+        branch=$($(params.git-branch) | sed 's|refs/heads/||') )
+        repo_dir="/workspace/source/$(params.clone-dir)"
+        rm -rf $repo_dir
+
+        if [ -d "$repo_dir/.git" ]; then
+          echo "Repository exists. Fetching the latest changes."
+          cd $repo_dir
+          # rm -rf $repo_dir
+          git fetch --all
+          git reset --hard origin/$branch
+        else
+          echo "Cloning repository."
+          git clone -b $branch https://$GITHUB_TOKEN@$(params.repo-url) $repo_dir
+          cd $repo_dir
+        fi
+
+        ls -la
+      volumeMounts:
+        - name: github-secret
+          mountPath: /github/creds/
+          readonly: true
+  volumes:
+    - name: github-secret
+      secret:
+        secretName: github-secret

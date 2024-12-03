@@ -1,8 +1,8 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: <%= componentName %>-push-trigger-binding
-  namespace: <%= projectName %>-namespace
+  name: spring-push-trigger-binding
+  namespace: test-namespace
 spec:
   params:
     - name: repo-url
@@ -26,8 +26,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: <%= componentName %>-push-trigger-template
-  namespace: <%= projectName %>-namespace
+  name: spring-push-trigger-template
+  namespace: test-namespace
 spec:
   params:
     - name: repo-url
@@ -45,21 +45,16 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: <%= componentName %>-push-trigger-run-
+        generateName: spring-push-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: <%= componentName %>-pipeline
+          name: spring-pipeline
         podTemplate:
           securityContext:
             fsGroup: 65532
         workspaces:
           - name: shared-data
-            <%_ if (cloudProvider == "aws" || cloudProvider == "azure") { _%>
-            persistentVolumeClaim:
-              claimName: tekton-pvc
-            <%_ } _%>
-            <%_ if (cloudProvider == "minikube") { _%>
             volumeClaimTemplate:
               spec:
                 accessModes:
@@ -67,7 +62,6 @@ spec:
                 resources:
                   requests:
                     storage: 2Gi
-            <%_ } _%>
           - name: github-secret
             secret:
               secretName: github-secret
@@ -95,8 +89,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: <%= componentName %>-pr-trigger-binding
-  namespace: <%= projectName %>-namespace
+  name: spring-pr-trigger-binding
+  namespace: test-namespace
 spec:
   params:
     - name: revision
@@ -119,8 +113,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: <%= componentName %>-pr-trigger-template
-  namespace: <%= projectName %>-namespace
+  name: spring-pr-trigger-template
+  namespace: test-namespace
 spec:
   params:
     - name: revision
@@ -136,11 +130,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: <%= componentName %>-pr-trigger-run-
+        generateName: spring-pr-trigger-run-
       spec:
         serviceAccountName: tekton-service-account
         pipelineRef:
-          name: <%= componentName %>-pr-test-cases
+          name: spring-pr-test-cases
         podTemplate:
           securityContext:
             fsGroup: 65532
@@ -148,7 +142,6 @@ spec:
           - name: shared-data
             persistentVolumeClaim:
               claimName: tekton-pvc
-            <%_ if (cloudProvider == "minikube") { _%>
             volumeClaimTemplate:
               spec:
                 accessModes:
@@ -156,7 +149,6 @@ spec:
                 resources:
                   requests:
                     storage: 2Gi
-            <%_ } _%>
           - name: github-secret
             secret:
               secretName: github-secret

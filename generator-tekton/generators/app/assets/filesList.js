@@ -18,7 +18,8 @@ const fileListtekton = [
   "pipelineruns/pr-test-cases-pipelinerun.yml",
   "triggers/triggers.yml",
   "README.md",
-  "pipeline-script.sh"
+  "pipeline-script.sh",
+  "config.env"
 ];
 
 module.exports = {

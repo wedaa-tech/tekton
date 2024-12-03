@@ -1,4 +1,4 @@
-# pv.yaml
+<%_ if (cloudProvider == "aws") { _%>
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -14,3 +14,20 @@ spec:
   awsElasticBlockStore:
     volumeID: $VOLUME_ID
     fsType: ext4
+<%_ } _%>
+<%_ if (cloudProvider == "azure") { _%>
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: tekton-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce # Options: ReadWriteOnce, ReadOnlyMany, ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: azure-disk-sc
+  csi:
+    driver: disk.csi.azure.com
+    volumeHandle: $VOLUME_ID # Replace with your Azure Disk ID
+<%_ } _%>

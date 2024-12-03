@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: <%= componentName %>-deploy
+  name: deploy
   namespace: <%= projectName %>-namespace
 spec:
   params:
@@ -27,10 +27,14 @@ spec:
     - name: aks-cluster-name
       type: string
   <%_ } _%>
+  <%_ if (cloudProvider == "minikube") { _%>
+    - name: minikube-config-dir
+      type: string
+  <%_ } _%>
   workspaces:
     - name: source
-  <%_ if (cloudProvider == "aws") { _%>
   steps:
+    <%_ if (cloudProvider == "aws") { _%>
     - name: setup-aws-credentials
       image: amazonlinux:2
       script: |
@@ -68,6 +72,16 @@ spec:
         echo "Deploying to AKS..."
         cd /workspace/source/$(params.clone-dir)
         az aks get-credentials --resource-group $(params.azure-resource-group) --name $(params.aks-cluster-name)
+        kubectl apply -f "yaml files"
+    <%_ } _%>
+    <%_ if (cloudProvider == "minikube") { _%>
+    - name: deploy-to-minikube
+      image: bitnami/kubectl:latest
+      script: |
+        #!/bin/bash
+        echo "Deploying to Minikube..."
+        export KUBECONFIG=$(params.minikube-config-dir)/kubeconfig
+        cd /workspace/source/$(params.clone-dir)
         kubectl apply -f "yaml files"
     <%_ } _%>
   

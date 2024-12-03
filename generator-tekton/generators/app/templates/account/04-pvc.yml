@@ -1,3 +1,4 @@
+<%_ if (cloudProvider == "aws") { _%>
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -10,3 +11,17 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: ebs-sc
+<%_ } _%>
+<%_ if (cloudProvider == "azure") { _%>
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tekton-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: azure-disk-sc
+<%_ } _%>
