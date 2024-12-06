@@ -1,0 +1,94 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: spring,go,react-pr-test-cases
+  namespace: test-namespace
+spec:
+  params:
+    - name: repo-url
+      type: string
+    - name: commit-sha
+      type: string
+    - name: revision
+      type: string
+    - name: submodules
+      type: string
+    - name: git-branch
+      type: string
+    - name: author
+      type: string
+    - name: clone-dir
+      type: string
+
+  workspaces:
+    - name: shared-data
+    - name: github-secret
+
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: clone-repo
+      workspaces:
+        - name: source
+          workspace: shared-data
+        - name: github-secret
+          workspace: github-secret
+      params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: submodules
+          value: $(params.submodules)
+        - name: git-branch
+          value: $(params.git-branch)
+        - name: author
+          value: $(params.author)
+          
+    - name: get-commit-sha
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: get-commit-sha
+      workspaces:
+        - name: source
+          workspace: shared-data
+      params:
+        - name: clone-dir
+          value: "$(params.clone-dir)"
+
+    - name: test-cases
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: cash-deposits-test-cases
+      workspaces:
+        - name: source
+          workspace: shared-data
+      params:
+        - name: clone-dir
+          value: $(params.clone-dir)
+        - name: git-branch
+          value: $(params.git-branch)
+
+  finally:
+    - name: send-status-to-github
+      taskRef:
+        name: send-status-to-github
+      params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: commit-sha
+          value: $(params.commit-sha)
+        - name: test-status
+          value: $(tasks.test-cases.results.test-status)
+        - name: coverage
+          value: $(tasks.test-cases.results.coverage)
+        - name: test-summary
+          value: $(tasks.test-cases.results.test-summary)
+      workspaces:
+        - name: source
+          workspace: shared-data
+        - name: github-secret
+          workspace: github-secret
+
+
+

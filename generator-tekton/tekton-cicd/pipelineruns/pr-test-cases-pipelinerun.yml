@@ -1,0 +1,37 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: spring,go,react-pr-trigger-run-
+  namespace: test-namespace
+spec:
+  serviceAccountName: tekton-service-account
+  pipelineRef:
+    name: spring,go,react-pr-test-cases
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+    - name: shared-data
+      persistentVolumeClaim:
+        claimName: tekton-pvc
+    - name: github-secret
+      secret:
+        secretName: github-secret
+    - name: docker-credentials
+      secret:
+        secretName: docker-credentials
+  params:
+    - name: repo-url
+      value: $(tt.params.repo-url)
+    - name: commit-sha
+      value: $(tt.params.commit-sha)
+    - name: revision
+      value: $(tt.params.revision)
+    - name: submodules
+      value: $(tt.params.submodules)
+    - name: git-branch
+      value: $(tt.params.git-branch)
+    - name: image-reference
+      value: $(tt.params.image-reference)
+    - name: clone-dir
+      value: $(tt.params.clone-dir)

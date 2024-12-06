@@ -1,5 +1,5 @@
 {
-  "componentName": ["spring", "go"],
+  "componentName": ["spring", "go", "react"],
   "projectName": "test",
   "cloudProvider": "minikube",
   "clusterName": "test-cluster"

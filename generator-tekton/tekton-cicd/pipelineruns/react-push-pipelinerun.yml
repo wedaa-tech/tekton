@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: react-push-trigger-run-
+  namespace: test-namespace
+spec:
+  serviceAccountName: tekton-service-account
+  pipelineRef:
+    name: react-pipeline
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+    - name: shared-data
+      persistentVolumeClaim:
+        claimName: tekton-pvc
+    - name: github-secret
+      secret:
+        secretName: github-secret
+    - name: docker-credentials
+      secret:
+        secretName: docker-credentials
+    - name: cache-dir
+      emptyDir: {}
+  params:
+    - name: repo-url
+      value: $(tt.params.repo-url)
+    - name: revision
+      value: $(tt.params.revision)
+    - name: submodules
+      value: $(tt.params.submodules)
+    - name: image-reference
+      value: $(tt.params.image-reference)
+    - name: git-branch
+      value: $(tt.params.git-branch)
+    - name: author
+      value: $(tt.params.author)
+    - name: clone-dir
+      value: $(tt.params.clone-dir)
+    - name: maven-image
+      value: $(tt.params.maven-image)
