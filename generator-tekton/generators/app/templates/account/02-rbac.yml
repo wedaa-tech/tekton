@@ -11,7 +11,7 @@ secrets:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: tekton-<%= componentName %>-role
+  name: tekton-role
   namespace: <%= projectName %>-namespace
 rules:
   - apiGroups: ["triggers.tekton.dev"]
@@ -41,7 +41,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tekton-<%= componentName %>-binding
+  name: tekton-binding
   namespace: <%= projectName %>-namespace
 subjects:
   - kind: ServiceAccount
@@ -50,12 +50,12 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: tekton-<%= componentName %>-role
+  name: tekton-role
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: tekton-<%= componentName %>-clusterrole
+  name: tekton-clusterrole
   namespace: <%= projectName %>-namespace
 rules:
   - apiGroups: ["triggers.tekton.dev"]
@@ -65,7 +65,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: tekton-<%= componentName %>-clusterbinding
+  name: tekton-clusterbinding
   namespace: <%= projectName %>-namespace
 subjects:
   - kind: ServiceAccount
@@ -74,12 +74,12 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: tekton-<%= componentName %>-clusterrole
+  name: tekton-clusterrole
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: tekton-<%= componentName %>-kubectl-role
+  name: tekton-kubectl-role
   namespace: <%= projectName %>-namespace
 rules:
   - apiGroups:
@@ -101,7 +101,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tekton-<%= componentName %>-kubectl-binding
+  name: tekton-kubectl-binding
   namespace: <%= projectName %>-namespace
 subjects:
   - kind: ServiceAccount
@@ -110,14 +110,14 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: tekton-<%= componentName %>-kubectl-role
+  name: tekton-kubectl-role
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: <%= projectName %>-namespace
-  name: tekton-<%= componentName %>-ssh-role
+  name: tekton-ssh-role
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
@@ -127,7 +127,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tekton-<%= componentName %>-ssh-binding
+  name: tekton-ssh-binding
   namespace: <%= projectName %>-namespace
 subjects:
   - kind: ServiceAccount
@@ -135,7 +135,7 @@ subjects:
     namespace: <%= projectName %>-namespace
 roleRef:
   kind: Role
-  name: tekton-<%= componentName %>-ssh-role
+  name: tekton-ssh-role
   apiGroup: rbac.authorization.k8s.io
 
 ---
@@ -153,7 +153,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: tekton-<%= componentName %>-git-access-binding
+  name: tekton-git-access-binding
   namespace: <%= projectName %>-namespace
 subjects:
   - kind: ServiceAccount
@@ -161,14 +161,14 @@ subjects:
     namespace: <%= projectName %>-namespace
 roleRef:
   kind: ClusterRole
-  name: tekton-<%= componentName %>-git-access
+  name: tekton-git-access
   apiGroup: rbac.authorization.k8s.io
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: tekton-<%= componentName %>-workspace-access-role
+  name: tekton-workspace-access-role
   namespace: <%= projectName %>-namespace
 rules:
   - apiGroups: [""]
@@ -185,12 +185,12 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: tekton-<%= componentName %>-workspace-access-binding
+  name: tekton-workspace-access-binding
   namespace: <%= projectName %>-namespace
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: tekton-<%= componentName %>-workspace-access-role
+  name: tekton-workspace-access-role
 subjects:
   - kind: ServiceAccount
     name: ticgo-pipeline-service-account
