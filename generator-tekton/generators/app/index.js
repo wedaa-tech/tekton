@@ -32,19 +32,64 @@ module.exports = class extends Generator {
 
       this._generateSharedFiles(options);
 
+      
+
       // Generate other shared files
     } catch (error) {
       this.log("Error during file generation:", error);
     }
   }
 
+  // _generateSharedDirectories(options) {
+  //   this.fs.copyTpl(
+  //     this.templatePath("account/"),
+  //     this.destinationPath("tekton-cicd/account/"),
+  //     options
+  //   );
+  // }
+
   _generateSharedDirectories(options) {
-    this.fs.copyTpl(
-      this.templatePath("account/"),
-      this.destinationPath("tekton-cicd/account/"),
-      options
-    );
+    // Always copy the files common for minikube
+    const commonFiles = [
+      "00-namespace.yml",
+      "01-secrets.yml",
+      "02-rbac.yml",
+      "event-listener.yml"
+    ];
+  
+    commonFiles.forEach(file => {
+      this.fs.copyTpl(
+        this.templatePath(`account/${file}`),
+        this.destinationPath(`tekton-cicd/account/${file}`),
+        options
+      );
+    });
+  
+    // If cloudProvider is AWS or Azure, generate all files in the account folder
+    if (options.cloudProvider === "aws" || options.cloudProvider === "azure") {
+      const allFiles = [
+        "00-namespace.yml",
+        "01-secrets.yml",
+        "02-rbac.yml",
+        "03-storageclass.yml",
+        "04-pvc.yml",
+        "05-pv.yml",
+        "event-listener.yml"
+      ];
+  
+      allFiles.forEach(file => {
+        this.fs.copyTpl(
+          this.templatePath(`account/${file}`),
+          this.destinationPath(`tekton-cicd/account/${file}`),
+          options
+        );
+      });
+    } else {
+      // Log for clarity if needed
+      this.log("Only namespace, secrets, rbac, and event-listener are generated for Minikube.");
+    }
   }
+  
 
   _generateComponentSpecificFiles(component, options) {
     const componentOptions = { ...options, componentName: component };

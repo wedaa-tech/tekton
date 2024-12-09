@@ -1,6 +1,6 @@
 {
   "componentName": ["spring", "go", "python"],
   "projectName": "test",
-  "cloudProvider": "minikube",
+  "cloudProvider": "aws",
   "clusterName": "test-cluster"
 }
