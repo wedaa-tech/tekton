@@ -30,7 +30,7 @@ module.exports = class extends Generator {
       });
 
       // Generate other shared files
-      this._generateSharedFiles(fileListtekton, options);
+      //this._generateSharedFiles(fileListtekton, options);
     } catch (error) {
       this.log("Error during file generation:", error);
     }

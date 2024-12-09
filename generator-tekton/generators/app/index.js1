@@ -30,8 +30,6 @@ module.exports = class extends Generator {
         this._generateComponentSpecificFiles(component, options);
       });
 
-      this._generateSharedFiles(options);
-
       // Generate other shared files
     } catch (error) {
       this.log("Error during file generation:", error);
@@ -110,29 +108,6 @@ module.exports = class extends Generator {
         options
       );
     });
-  }
-
-  _generateSharedFiles(options) {
-    // Generate README.md
-    this.fs.copyTpl(
-      this.templatePath("README.md"),
-      this.destinationPath("tekton-cicd/README.md"),
-      options
-    );
-
-    // Generate pipeline-script.sh
-    this.fs.copyTpl(
-      this.templatePath("pipeline-script.sh"),
-      this.destinationPath("tekton-cicd/pipeline-script.sh"),
-      options
-    );
-
-    // Generate config.env
-    this.fs.copyTpl(
-      this.templatePath("config.env"),
-      this.destinationPath("tekton-cicd/config.env"),
-      options
-    );
   }
     
 
