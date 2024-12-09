@@ -22,18 +22,16 @@ module.exports = class extends Generator {
 
     try {
       // Generate shared directories like "account"
-      
       this._generateSharedDirectories(options);
-      
-      
+
       // Generate files for each component
       options.componentName.forEach(component => {
         this._generateComponentSpecificFiles(component, options);
       });
 
       this._generateNonComponentSpecificTasks(options);
-      this._generateSharedFiles(fileList, options);
-    
+      // this._generateSharedFiles(fileList, options);
+
       // Generate other shared files
     } catch (error) {
       this.log("Error during file generation:", error);
@@ -46,10 +44,10 @@ module.exports = class extends Generator {
       "task/github-clone-repo-task.yml",
       "task/get-commit-sha-task.yml",
       "task/docker-buid-push-task.yml",
-      "task/deploy-task.yml",
+      "task/deploy-task.yml"
     ];
-  
-    nonComponentTasks.forEach((taskFile) => {
+
+    nonComponentTasks.forEach(taskFile => {
       this.fs.copyTpl(
         this.templatePath(taskFile),
         this.destinationPath(`tekton-cicd/${taskFile}`),
@@ -58,14 +56,35 @@ module.exports = class extends Generator {
     });
   }
 
-  
   _generateSharedDirectories(options) {
-    this.fs.copyTpl(
-      this.templatePath("account/"),
-      this.destinationPath("tekton-cicd/account/"),
-      options
-    );
+    const cloudProvider = options.cloudProvider;
+  
+    // Check if cloud provider is minikube
+    if (cloudProvider === "minikube") {
+      // Only copy the files excluding pvc.yml and pv.yml
+      const filesToCopy = fs.readdirSync(this.templatePath("account/")).filter(file => {
+        // Exclude the unwanted files when cloud provider is minikube
+        return !(file === "04-pvc.yml" || file === "05-pv.yml" || file === "03-storageclass.yml");
+      });
+  
+      // Copy filtered files
+      filesToCopy.forEach(file => {
+        this.fs.copyTpl(
+          this.templatePath(`account/${file}`),
+          this.destinationPath(`tekton-cicd/account/${file}`),
+          options
+        );
+      });
+    } else {
+      // For other cloud providers, copy all files
+      this.fs.copyTpl(
+        this.templatePath("account/"),
+        this.destinationPath("tekton-cicd/account/"),
+        options
+      );
+    }
   }
+  
 
   _generateComponentSpecificFiles(component, options) {
     const componentOptions = { ...options, componentName: component };
@@ -77,7 +96,7 @@ module.exports = class extends Generator {
       ),
       componentOptions
     );
-    
+
     this.fs.copyTpl(
       this.templatePath("pipelines/pr-test-cases-pipeline.yml"),
       this.destinationPath(
@@ -119,32 +138,6 @@ module.exports = class extends Generator {
       this.destinationPath(`tekton-cicd/task/${component}-test-cases-task.yml`),
       componentOptions
     );
-
-  }
-
-  _generateSharedFiles(fileList, options) {
-    const isMinikube = options.cloudProvider === "minikube";
-
-    this.log(`Cloud Provider: ${options.cloudProvider}`);
-    fileList.forEach(file => {
-      this.log(`Processing file: ${file}`);
-      if (
-        isMinikube &&
-        (file.includes("03-storageclass.yml") ||
-          file.includes("04-pvc.yml") ||
-          file.includes("05-pv.yml"))
-      ) {
-        this.log(`Skipping file: ${file} because cloud provider is Minikube`);
-        return; // Skip these files
-      }
-
-      // Copy only non-skipped files
-      this.fs.copyTpl(
-        this.templatePath(file),
-        this.destinationPath(`tekton-cicd/${file}`),
-        options
-      );
-    });
   }
 
   install() {

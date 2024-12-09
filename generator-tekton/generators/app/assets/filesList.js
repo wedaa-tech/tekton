@@ -5,7 +5,7 @@ const fileListtekton = [
   "account/03-storageclass.yml",
   "account/04-pvc.yml",
   "account/05-pv.yml",
-  "account/06-event-listener.yml",
+  "account/event-listener.yml",
   "task/test-cases-task.yml",
   "task/send-status-to-github-task.yml",
   "task/github-clone-repo-task.yml",
