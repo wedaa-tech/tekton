@@ -1,5 +1,6 @@
 {
-  "componentName": ["trggrt", "gfhg"],
-  "projectName": "eferg",
-  "cloudProvider": "aws"
+  "componentName": ["spring", "go", "python"],
+  "projectName": "test",
+  "cloudProvider": "minikube",
+  "clusterName": "test-cluster"
 }
