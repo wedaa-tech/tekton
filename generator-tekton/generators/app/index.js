@@ -32,8 +32,6 @@ module.exports = class extends Generator {
 
       this._generateSharedFiles(options);
 
-      
-
       // Generate other shared files
     } catch (error) {
       this.log("Error during file generation:", error);
@@ -56,7 +54,7 @@ module.exports = class extends Generator {
       "02-rbac.yml",
       "event-listener.yml"
     ];
-  
+
     commonFiles.forEach(file => {
       this.fs.copyTpl(
         this.templatePath(`account/${file}`),
@@ -64,7 +62,7 @@ module.exports = class extends Generator {
         options
       );
     });
-  
+
     // If cloudProvider is AWS or Azure, generate all files in the account folder
     if (options.cloudProvider === "aws" || options.cloudProvider === "azure") {
       const allFiles = [
@@ -76,7 +74,7 @@ module.exports = class extends Generator {
         "05-pv.yml",
         "event-listener.yml"
       ];
-  
+
       allFiles.forEach(file => {
         this.fs.copyTpl(
           this.templatePath(`account/${file}`),
@@ -86,10 +84,11 @@ module.exports = class extends Generator {
       });
     } else {
       // Log for clarity if needed
-      this.log("Only namespace, secrets, rbac, and event-listener are generated for Minikube.");
+      this.log(
+        "Only namespace, secrets, rbac, and event-listener are generated for Minikube."
+      );
     }
   }
-  
 
   _generateComponentSpecificFiles(component, options) {
     const componentOptions = { ...options, componentName: component };
@@ -129,7 +128,8 @@ module.exports = class extends Generator {
     this.fs.copyTpl(
       this.templatePath("triggers/triggers.yml"),
       this.destinationPath(`tekton-cicd/triggers/${component}-triggers.yml`),
-      componentOptions
+      { ...componentOptions, componentName: component }
+      // componentOptions
     );
 
     this.fs.copyTpl(
@@ -147,7 +147,7 @@ module.exports = class extends Generator {
       "task/docker-buid-push-task.yml",
       "task/deploy-task.yml"
     ];
-    
+
     nonComponentTasks.forEach(taskFile => {
       this.fs.copyTpl(
         this.templatePath(taskFile),
@@ -179,7 +179,6 @@ module.exports = class extends Generator {
       options
     );
   }
-    
 
   install() {
     this.log("Tekton files generation completed...");

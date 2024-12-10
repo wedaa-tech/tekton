@@ -60,7 +60,7 @@ spec:
       onError: continue
       runAfter: ["fetch-source"]
       taskRef:
-        name: cash-deposits-test-cases
+        name: <%= componentName %>-test-cases
       workspaces:
         - name: source
           workspace: shared-data

@@ -77,7 +77,7 @@ process_directories() {
       local repo_name
       repo_name=$(basename "$dir")
 
-      if [[ "$repo_name" == "blueprints" || "$repo_name" == "HOW_TO_RUN.md" || "$repo_name" == *.zip ]]; then
+      if [[ "$repo_name" == "blueprints" || "$repo_name" == "tekton-cicd" || "$repo_name" == "HOW_TO_RUN.md" || "$repo_name" == *.zip ]]; then
         echo "Skipping $repo_name..."
         continue
       fi
@@ -148,28 +148,11 @@ install_tekton() {
 
 # Apply YAML configurations
 apply_yaml_configs() {
-  for file in account/*.yml; do
-    kubectl apply -f "$file"
-    check_command "Applying $file"
-  done
-
-  for file in task/*.yml; do
-    kubectl apply -f "$file"
-    check_command "Applying $file"
-  done
-
-  for file in pipelines/*.yml; do
-    kubectl apply -f "$file"
-    check_command "Applying $file"
-  done
-
-  for file in pipelineruns/*.yml; do
-    kubectl apply -f "$file"
-    check_command "Applying $file"
-  done
-
-  kubectl apply -f triggers/triggers.yml
-  check_command "Applying triggers.yml"
+  kubectl apply -f account/
+  kubectl apply -f task/
+  kubectl apply -f pipelines/
+  kubectl apply -f triggers/
+  kubectl apply -f pipelineruns/
 }
 
 # Main function
