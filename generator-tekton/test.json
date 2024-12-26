@@ -2,5 +2,6 @@
   "componentName": ["spring", "go", "react"],
   "projectName": "test",
   "cloudProvider": "minikube",
-  "clusterName": "test-cluster"
+  "clusterName": "test-cluster",
+  "imageUri": "saijayanth680/tekton"
 }

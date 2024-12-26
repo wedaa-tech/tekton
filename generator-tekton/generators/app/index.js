@@ -129,7 +129,7 @@ module.exports = class extends Generator {
       this.templatePath("triggers/triggers.yml"),
       this.destinationPath(`tekton-cicd/triggers/${component}-triggers.yml`),
       { ...componentOptions, componentName: component }
-      // componentOptions
+      // ComponentOptions
     );
 
     this.fs.copyTpl(

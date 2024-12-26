@@ -16,7 +16,7 @@ spec:
     - name: git-branch
       value: $(body.ref)    
     - name: image-reference
-      value: $IMAGE_URI   
+      value: <%= imageUri %>   
     - name: clone-dir
       value: $(body.repository.full_name)
     - name: maven-image
@@ -110,7 +110,7 @@ spec:
     - name: submodules
       value: "false"
     - name: image-reference
-      value: $IMAGE_URI
+      value: <%= imageUri %>
     - name: clone-dir
       value: $(body.repository.full_name)
  

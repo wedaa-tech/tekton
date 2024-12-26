@@ -7,6 +7,9 @@ spec:
   resources:
     kubernetesResource:
       serviceType: LoadBalancer
+    <%_ if (cloudProvider == "minikube") { _%>
+      serviceType: NodePort
+    <%_ } _%>
   serviceAccountName: tekton-service-account
   triggers:
     - name: push-trigger
@@ -51,4 +54,5 @@ spec:
       template:
         ref: <%= componentName %>-pr-trigger-template
 
-   
+
+      

@@ -109,6 +109,7 @@ install_tekton() {
   echo "Installing Tekton Dashboard..."
   kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/release-full.yaml
   check_command "Tekton Dashboard installation"
+  
 <%_ if (cloudProvider == "aws" || cloudProvider == "azure") { _%>
   # Expose Tekton Dashboard via LoadBalancer
   echo "Exposing Tekton Dashboard via LoadBalancer..."
@@ -152,7 +153,7 @@ apply_yaml_configs() {
   kubectl apply -f task/
   kubectl apply -f pipelines/
   kubectl apply -f triggers/
-  kubectl apply -f pipelineruns/
+  kubectl create -f pipelineruns/
 }
 
 # Main function

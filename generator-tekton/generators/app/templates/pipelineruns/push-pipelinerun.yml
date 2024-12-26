@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: <%= componentName %>-push-trigger-run-
+  name: <%= componentName %>-push-pipeline-run
   namespace: <%= projectName %>-namespace
 spec:
   serviceAccountName: tekton-service-account
